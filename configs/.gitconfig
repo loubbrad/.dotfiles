@@ -1,0 +1,12 @@
+[user]
+	email = loua19@outlook.com
+	name = Louis
+[init]
+	defaultBranch = main
+[credential]
+	helper = cache
+[filter "lfs"]
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
+	required = true
+	clean = git-lfs clean -- %f
