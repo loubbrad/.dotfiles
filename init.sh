@@ -42,7 +42,7 @@ fi
 
 install_tools() {
     echo "> Installing base tools: zsh, tmux, git, curl, wget, xclip gnupg..."
-    eval $PKG_INSTALL zsh tmux git curl wget xclip gnupg, 
+    eval $PKG_INSTALL zsh tmux git curl wget xclip gnupg
 }
 
 install_neovim() {
