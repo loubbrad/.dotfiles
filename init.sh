@@ -1,9 +1,15 @@
 #!/bin/bash
 set -e 
 
+
 DOTFILES_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &> /dev/null && pwd)
 INSTALL_CONDA=false
 SHELL_RESTART_REQUIRED=false
+
+if [ "$(uname -m)" != "x86_64" ]; then
+    echo "This script only supports the x86_64 architecture." >&2
+    exit 1
+fi
 
 if [[ " $@ " =~ " --conda " ]]; then
     INSTALL_CONDA=true
@@ -21,8 +27,8 @@ else
 fi
 
 install_tools() {
-    echo "> Installing base tools: zsh, tmux, git, curl, wget..."
-    eval $PKG_INSTALL zsh tmux git curl wget
+    echo "> Installing base tools: zsh, tmux, git, curl, wget, xclip..."
+    eval $PKG_INSTALL zsh tmux git curl wget xclip
 }
 
 install_neovim() {
@@ -30,10 +36,10 @@ install_neovim() {
         return
     fi
     echo "> Installing Neovim..."
-    curl -LO https://github.com/neovim/neovim/releases/latest/download/nvim-linux64.tar.gz
+    curl -LO https://github.com/neovim/neovim/releases/latest/download/nvim-linux-x86_64.tar.gz
     mkdir -p "$HOME/nvim"
-    tar -C "$HOME/nvim" -xzf nvim-linux64.tar.gz --strip-components=1
-    rm nvim-linux64.tar.gz
+    tar -C "$HOME/nvim" -xzf nvim-linux-x86_64.tar.gz --strip-components=1
+    rm nvim-linux-x86_64.tar.gz
 }
 
 install_miniconda() {
