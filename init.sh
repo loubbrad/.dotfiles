@@ -25,10 +25,6 @@ if [ "$(uname -m)" != "x86_64" ]; then
     exit 1
 fi
 
-if [[ " $@ " =~ " --conda " ]]; then
-    INSTALL_CONDA=true
-fi
-
 if command -v apt >/dev/null 2>&1; then
     PKG_INSTALL="sudo apt update && sudo apt install -y"
 elif command -v yum >/dev/null 2>&1; then
