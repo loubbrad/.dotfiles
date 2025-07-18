@@ -9,6 +9,10 @@ HISTSIZE=10000
 SAVEHIST=10000
 HISTFILE=~/.cache/zsh/history
 
+setopt INC_APPEND_HISTORY
+setopt SHARE_HISTORY
+setopt HIST_IGNORE_ALL_DUPS
+
 # Basic auto/tab complete:
 autoload -U compinit
 zstyle ':completion:*' menu select
