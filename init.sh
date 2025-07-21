@@ -8,8 +8,7 @@ SHELL_RESTART_REQUIRED=false
 
 for arg in "$@"; do
   case $arg in
-    --conda)
-      INSTALL_CONDA=true
+    --conda) INSTALL_CONDA=true
       shift
       ;;
     --ssh)
@@ -37,8 +36,8 @@ else
 fi
 
 install_tools() {
-    echo "> Installing base tools: zsh, tmux, git, curl, wget, xclip gnupg..."
-    eval $PKG_INSTALL zsh tmux git curl wget xclip gnupg
+    echo "> Installing base tools: zsh, tmux, git, curl, wget, xclip, gnupg, fzf, fd, ag..."
+    eval $PKG_INSTALL zsh tmux git curl wget xclip gnupg fzf fd-find silversearcher-ag
 }
 
 install_neovim() {

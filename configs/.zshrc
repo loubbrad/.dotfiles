@@ -13,6 +13,14 @@ setopt INC_APPEND_HISTORY
 setopt SHARE_HISTORY
 setopt HIST_IGNORE_ALL_DUPS
 
+# Editor
+export EDITOR=nvim
+export VISUAL=nvim
+
+# FZF
+export FZF_DEFAULT_COMMAND='ag -g .'
+export FZF_CTRL_T_COMMAND='fd --strip-cwd-prefix'
+
 # Basic auto/tab complete:
 autoload -U compinit
 zstyle ':completion:*' menu select
@@ -48,13 +56,7 @@ zle -N zle-line-init
 echo -ne '\e[5 q' # Use beam shape cursor on startup.
 preexec() { echo -ne '\e[5 q' ;} # Use beam shape cursor for each new prompt.
 
-# Custom history grep command
-hgrep() {
-    # Load history from the history file
-    fc -R
-    # Use fc -l to list history and grep it
-    fc -ln 1 | grep --color=auto -i "$@"
-}
+source /usr/share/doc/fzf/examples/key-bindings.zsh
 
 # Env specific shell settings
 if [[ -f "$HOME/.local/bin/env" ]]; then
