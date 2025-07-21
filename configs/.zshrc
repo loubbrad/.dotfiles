@@ -19,7 +19,7 @@ export VISUAL=nvim
 
 # FZF
 export FZF_DEFAULT_COMMAND='ag -g .'
-export FZF_CTRL_T_COMMAND='fd --strip-cwd-prefix'
+export FZF_CTRL_T_COMMAND='fdfind'
 
 # Basic auto/tab complete:
 autoload -U compinit
