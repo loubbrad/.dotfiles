@@ -76,7 +76,7 @@ link_configs() {
     ln -sfn "$DOTFILES_DIR/configs/init.vim" "$HOME/.config/nvim/init.vim"
     echo " - Linked init.vim"
 
-    ln -sfn "$DOTFILES_DIR/configs/key-bindings.zsh" "/usr/share/doc/fzf/examples/key-bindings.zsh"
+    sudo ln -sfn "$DOTFILES_DIR/configs/key-bindings.zsh" "/usr/share/doc/fzf/examples/key-bindings.zsh"
     echo " - Linked key-bindings.zsh"
 }
 
