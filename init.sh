@@ -75,6 +75,9 @@ link_configs() {
     mkdir -p "$HOME/.config/nvim"
     ln -sfn "$DOTFILES_DIR/configs/init.vim" "$HOME/.config/nvim/init.vim"
     echo " - Linked init.vim"
+
+    ln -sfn "$DOTFILES_DIR/configs/key-bindings.zsh" "/usr/share/doc/fzf/examples/key-bindings.zsh"
+    echo " - Linked key-bindings.zsh"
 }
 
 install_ssh() {
