@@ -19,3 +19,10 @@ vnoremap <leader>d "_d
 " Center after jump
 nnoremap <C-u> <C-u>zz
 nnoremap <C-d> <C-d>zz
+
+" Swap search word-direction keys
+nnoremap * #
+nnoremap # *
+nnoremap g* g#
+nnoremap g# g*
+
