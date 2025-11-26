@@ -108,6 +108,7 @@ install_ssh() {
     if gpg --decrypt "$encrypted_archive" 2>/dev/null | tar -xz -C "$HOME/.ssh"; then
         echo "  - Setting secure file permissions..."
         chmod 700 "$HOME/.ssh"
+        chown -R "$USER:$USER" "$HOME/.ssh"
         find "$HOME/.ssh" -type f ! -name "*.pub" -exec chmod 600 {} +
         find "$HOME/.ssh" -type f -name "*.pub" -exec chmod 644 {} +
         echo " - SSH keys installed successfully."
