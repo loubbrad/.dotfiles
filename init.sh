@@ -44,9 +44,22 @@ install_neovim() {
     if command -v nvim >/dev/null 2>&1; then
         return
     fi
-    echo "> Installing Neovim..."
-    curl -LO https://github.com/neovim/neovim/releases/latest/download/nvim-linux-x86_64.tar.gz
+    
+    SYSTEM_GLIBC=$(ldd --version | head -n1 | grep -oE '[0-9]+\.[0-9]+' | head -n1)
+    REQUIRED_GLIBC="2.33"
+
+    # Compare required versions
+    if [ "$(printf '%s\n' "$REQUIRED_GLIBC" "$SYSTEM_GLIBC" | sort -V | head -n1)" = "$SYSTEM_GLIBC" ] && [ "$SYSTEM_GLIBC" != "$REQUIRED_GLIBC" ]; then
+        echo "> System GLIBC ($SYSTEM_GLIBC) is older than required ($REQUIRED_GLIBC)."
+        echo "> Installing fallback Neovim (static/older GLIBC support)..."
+        NVIM_URL="https://github.com/neovim/neovim-releases/releases/download/v0.11.5/nvim-linux-x86_64.tar.gz"
+    else
+        echo "> Installing Neovim..."
+        NVIM_URL="https://github.com/neovim/neovim/releases/latest/download/nvim-linux-x86_64.tar.gz"
+    fi
+
     mkdir -p "$HOME/nvim"
+    curl -LO "$NVIM_URL"
     tar -C "$HOME/nvim" -xzf nvim-linux-x86_64.tar.gz --strip-components=1
     rm nvim-linux-x86_64.tar.gz
 }
