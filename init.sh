@@ -108,8 +108,8 @@ install_ssh() {
     if gpg --decrypt "$encrypted_archive" 2>/dev/null | tar -xz -C "$HOME/.ssh"; then
         echo "  - Setting secure file permissions..."
         chmod 700 "$HOME/.ssh"
-        find "$HOME/.ssh" -type f ! -name "*.pub" ! -name "config" ! -name "known_hosts*" -exec chmod 600 {} +
-        find "$HOME/.ssh" -type f \( -name "*.pub" -o -name "config" -o -name "known_hosts*" \) -exec chmod 644 {} +
+        find "$HOME/.ssh" -type f ! -name "*.pub" -exec chmod 600 {} +
+        find "$HOME/.ssh" -type f -name "*.pub" -exec chmod 644 {} +
         echo " - SSH keys installed successfully."
     else
         echo " - Error: Decryption or extraction failed. Was the passphrase correct?" >&2
