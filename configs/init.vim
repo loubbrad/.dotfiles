@@ -43,7 +43,7 @@ nnoremap <leader># <cmd>lua
 \ if vim.fn.winnr('$') == 1 then vim.cmd('vsplit') else vim.cmd('normal! <C-w>w') end
 \ vim.api.nvim_set_current_buf(curr_buf)
 \ vim.api.nvim_win_set_cursor(0, curr_pos)
-\ vim.cmd('normal! #')<CR>
+\ vim.cmd('normal! *')<CR>
 
 nnoremap <leader>/ <cmd>lua
 \ local curr_buf = vim.api.nvim_get_current_buf()
