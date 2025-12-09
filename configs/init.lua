@@ -6,7 +6,9 @@ vim.opt.shiftwidth = 4
 vim.opt.expandtab = true
 vim.g.mapleader = " "
 
-vim.cmd('colorscheme habamax')
+vim.cmd('colorscheme torte')
+vim.api.nvim_set_hl(0, "StatusLine", { link = "Normal" })
+vim.api.nvim_set_hl(0, "StatusLineNC", { link = "Normal" })
 
 -- Cache change history
 local undo_dir = vim.fn.stdpath('cache') .. '/undo'
@@ -57,18 +59,14 @@ vim.keymap.set('n', '<C-l>', '<C-w>l')
 -- Save without opening as sudo
 vim.cmd('cmap w!! %!sudo tee > /dev/null %')
 
--- System clipboard through ssh (Requires Neovim 0.10+)
--- RECOVERY NOTE: The 'strings' output had 'vim.ui.clipboard', which is likely a typo.
--- I used the version from your cache which uses the standard 'vim.clipboard.osc52'.
+-- Send "+ to system clipboard through ssh
 vim.g.clipboard = {
   name = 'OSC 52',
   copy = {
     ['+'] = require('vim.ui.clipboard.osc52').copy('+'),
-    ['*'] = require('vim.ui.clipboard.osc52').copy('*'),
   },
   paste = {
     ['+'] = function() return {} end,
-    ['*'] = function() return {} end,
   },
 }
 
@@ -102,3 +100,4 @@ vim.keymap.set('n', '<leader>/', function()
     vim.api.nvim_feedkeys('/', 'n', false)
   end)
 end)
+
