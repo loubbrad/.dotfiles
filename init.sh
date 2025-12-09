@@ -36,8 +36,8 @@ else
 fi
 
 install_tools() {
-    echo "> Installing base tools: zsh, tmux, git, curl, wget, xclip, gnupg, fzf, fd, ag..."
-    eval $PKG_INSTALL zsh tmux git curl wget xclip gnupg fzf fd-find silversearcher-ag
+    echo "> Installing base tools: zsh, tmux, git, curl, wget, xclip, gnupg, fzf, fd, ag, ripgrep..."
+    eval $PKG_INSTALL zsh tmux git curl wget xclip gnupg fzf fd-find silversearcher-ag ripgrep
 }
 
 install_neovim() {
@@ -86,8 +86,8 @@ link_configs() {
     echo " - Linked .tmux.conf"
     
     mkdir -p "$HOME/.config/nvim"
-    ln -sfn "$DOTFILES_DIR/configs/init.vim" "$HOME/.config/nvim/init.vim"
-    echo " - Linked init.vim"
+    ln -sfn "$DOTFILES_DIR/configs/init.lua" "$HOME/.config/nvim/init.lua"
+    echo " - Linked init.lua"
 
     sudo ln -sfn "$DOTFILES_DIR/configs/key-bindings.zsh" "/usr/share/doc/fzf/examples/key-bindings.zsh"
     echo " - Linked key-bindings.zsh"
