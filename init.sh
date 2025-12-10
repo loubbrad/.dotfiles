@@ -85,8 +85,8 @@ link_configs() {
     ln -sfn "$DOTFILES_DIR/configs/.tmux.conf" "$HOME/.tmux.conf"
     echo " - Linked .tmux.conf"
     
-    mkdir -p "$HOME/.config/nvim"
-    ln -sfn "$DOTFILES_DIR/configs/init.lua" "$HOME/.config/nvim/init.lua"
+    mkdir -p "$HOME/.config"
+    ln -sfnT "$DOTFILES_DIR/configs/nvim" "$HOME/.config/nvim"
     echo " - Linked init.lua"
 
     sudo ln -sfn "$DOTFILES_DIR/configs/key-bindings.zsh" "/usr/share/doc/fzf/examples/key-bindings.zsh"

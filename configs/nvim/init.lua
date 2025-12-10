@@ -10,7 +10,7 @@ vim.cmd('colorscheme torte')
 vim.api.nvim_set_hl(0, "StatusLine", { link = "Normal" })
 vim.api.nvim_set_hl(0, "StatusLineNC", { link = "Normal" })
 
--- Cache change history
+-- Cache history
 local undo_dir = vim.fn.stdpath('cache') .. '/undo'
 
 -- NOTE: 0700 (octal) ~ 448 (decimal)
@@ -26,16 +26,13 @@ vim.opt.undolevels = 100
 vim.opt.fillchars = {vert = " "}
 vim.opt.splitright = true
 vim.opt.laststatus = 3
-
--- Write
-vim.keymap.set('n', '<leader>w', ':write<CR>')
+vim.keymap.set('n', '<leader>w', '<C-w>', { noremap = true })
 
 -- Paste without overwriting register
 vim.keymap.set('x', '<leader>p', '"_dP')
 
 -- Yank to system clipboard
 vim.keymap.set({'n', 'v'}, '<leader>y', '"+y')
---- vim.keymap.set('n', '<leader>Y', '"+Y')
 
 -- Delete to black hole register
 vim.keymap.set({'n', 'v'}, '<leader>d', '"_d')
@@ -49,12 +46,6 @@ vim.keymap.set('n', '*', '#')
 vim.keymap.set('n', '#', '*')
 vim.keymap.set('n', 'g*', 'g#')
 vim.keymap.set('n', 'g#', 'g*')
-
--- Window navigation
-vim.keymap.set('n', '<C-j>', '<C-w>j')
-vim.keymap.set('n', '<C-k>', '<C-w>k')
-vim.keymap.set('n', '<C-h>', '<C-w>h')
-vim.keymap.set('n', '<C-l>', '<C-w>l')
 
 -- Save without opening as sudo
 vim.cmd('cmap w!! %!sudo tee > /dev/null %')
@@ -100,4 +91,22 @@ vim.keymap.set('n', '<leader>/', function()
     vim.api.nvim_feedkeys('/', 'n', false)
   end)
 end)
+
+
+-- Plugins
+local path_package = vim.fn.stdpath('data') .. '/site/'
+local mini_path = path_package .. 'pack/deps/start/mini.nvim'
+if not vim.loop.fs_stat(mini_path) then
+  vim.cmd('echo "Installing `mini.nvim`" | redraw')
+  vim.fn.system({
+    'git', 'clone', '--filter=blob:none',
+    'https://github.com/echasnovski/mini.nvim', mini_path
+  })
+  vim.cmd('packadd mini.nvim | helptags ALL')
+end
+
+require('mini.deps').setup({ path = { package = path_package } })
+require('plug.lsp')
+require('plug.fzf')
+require('plug.oil')
 
