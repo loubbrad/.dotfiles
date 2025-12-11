@@ -30,6 +30,7 @@ vim.opt.fillchars = {vert = " "}
 vim.opt.splitright = true
 vim.opt.laststatus = 3
 vim.keymap.set('n', '<leader>w', '<C-w>', { noremap = true })
+vim.keymap.set('n', '<leader><Tab>', '<cmd>b#<CR>')
 
 -- Paste without overwriting register
 vim.keymap.set('x', '<leader>p', '"_dP')
@@ -44,7 +45,7 @@ vim.keymap.set({'n', 'v'}, '<leader>d', '"_d')
 vim.keymap.set('n', '<C-u>', '<C-u>zz')
 vim.keymap.set('n', '<C-d>', '<C-d>zz')
 
-
+-- Quick fix list
 vim.keymap.set('n', '<M-j>', '<cmd>cnext<CR>')
 vim.keymap.set('n', '<M-k>', '<cmd>cprev<CR>')
 vim.keymap.set('n', '<leader>q', '<cmd>cclose<CR>')
