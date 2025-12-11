@@ -1,37 +1,31 @@
 MiniDeps.add({ source = 'neovim/nvim-lspconfig' })
 
-vim.api.nvim_create_autocmd("BufWritePre", {
-    pattern = "*.py",
-    callback = function()
-        local view = vim.fn.winsaveview()
-        vim.cmd(':%!black -q -l 80 -') 
-        vim.fn.winrestview(view)
-    end,
-})
-
 vim.api.nvim_create_autocmd('LspAttach', {
     callback = function(event)
         local opts = { buffer = event.buf }
 
         vim.keymap.set('n', 'gd', vim.lsp.buf.definition, opts)      
+        vim.keymap.set('n', '<leader>gd', function() _G.smart_split_action(vim.lsp.buf.definition) end, opts)
+
         vim.keymap.set('n', 'gr', function() require('fzf-lua').lsp_references() end, opts)
         vim.keymap.set('n', '<leader>rn', vim.lsp.buf.rename, opts)  
         vim.keymap.set('i', '<C-k>', vim.lsp.buf.signature_help, opts) 
         vim.keymap.set('n', 'K', vim.lsp.buf.hover, opts)            
+
         vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, opts)
         vim.keymap.set('n', ']d', vim.diagnostic.goto_next, opts)
         vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float, opts)
     end,
 })
 
-local lspconfig = require('lspconfig')
 local capabilities = vim.lsp.protocol.make_client_capabilities()
 local servers = { 'pyright' }
 
 for _, server in ipairs(servers) do
-    if vim.fn.executable(server) == 1 or vim.fn.executable(server .. ".cmd") == 1 then
-        lspconfig[server].setup({
-            capabilities = capabilities,
-        })
-    end
+  if vim.fn.executable(server) == 1 then
+    vim.lsp.config(server, {
+      capabilities = capabilities,
+    })
+    vim.lsp.enable(server)
+  end
 end

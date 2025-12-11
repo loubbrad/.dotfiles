@@ -69,7 +69,7 @@ vim.g.clipboard = {
 }
 
 -- Open new window commands
-local function smart_split_action(callback)
+function _G.smart_split_action(callback)
   local curr_buf = vim.api.nvim_get_current_buf()
   local curr_pos = vim.api.nvim_win_get_cursor(0)
 
@@ -86,31 +86,33 @@ local function smart_split_action(callback)
 end
 
 vim.keymap.set('n', '<leader>gd', function()
-  smart_split_action(function() vim.cmd('normal! gd') end)
+  _G.smart_split_action(function() vim.cmd('normal! gd') end)
 end)
 
 vim.keymap.set('n', '<leader>#', function()
-  smart_split_action(function() vim.cmd('normal! *') end)
+  _G.smart_split_action(function() vim.cmd('normal! *') end)
 end)
 
 vim.keymap.set('n', '<leader>/', function()
-  smart_split_action(function()
+  _G.smart_split_action(function()
     vim.api.nvim_feedkeys('/', 'n', false)
   end)
 end)
 
-
 -- Plugins
 local path_package = vim.fn.stdpath('data') .. '/site/'
 local mini_path = path_package .. 'pack/deps/start/mini.nvim'
+
 if not vim.loop.fs_stat(mini_path) then
   vim.cmd('echo "Installing `mini.nvim`" | redraw')
   vim.fn.system({
     'git', 'clone', '--filter=blob:none',
     'https://github.com/echasnovski/mini.nvim', mini_path
   })
-  vim.cmd('helptags ALL')
+  vim.cmd('packadd mini.nvim | helptags ALL')
 end
+
+vim.cmd('packadd mini.nvim')
 
 require('mini.deps').setup({ path = { package = path_package } })
 require('plug.lsp')
