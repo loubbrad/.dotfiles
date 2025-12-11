@@ -10,6 +10,9 @@ vim.cmd('colorscheme torte')
 vim.api.nvim_set_hl(0, "StatusLine", { link = "Normal" })
 vim.api.nvim_set_hl(0, "StatusLineNC", { link = "Normal" })
 
+vim.opt.colorcolumn = "80"
+vim.api.nvim_set_hl(0, "ColorColumn", { bg = "#2a2a2a" }) 
+
 -- Cache history
 local undo_dir = vim.fn.stdpath('cache') .. '/undo'
 
@@ -40,6 +43,10 @@ vim.keymap.set({'n', 'v'}, '<leader>d', '"_d')
 -- Center after jump
 vim.keymap.set('n', '<C-u>', '<C-u>zz')
 vim.keymap.set('n', '<C-d>', '<C-d>zz')
+
+
+vim.keymap.set('n', '<M-j>', '<cmd>cnext<CR>')
+vim.keymap.set('n', '<M-k>', '<cmd>cprev<CR>')
 
 -- Swap search word-direction keys
 vim.keymap.set('n', '*', '#')
