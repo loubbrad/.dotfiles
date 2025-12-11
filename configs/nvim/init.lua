@@ -47,6 +47,7 @@ vim.keymap.set('n', '<C-d>', '<C-d>zz')
 
 vim.keymap.set('n', '<M-j>', '<cmd>cnext<CR>')
 vim.keymap.set('n', '<M-k>', '<cmd>cprev<CR>')
+vim.keymap.set('n', '<leader>q', '<cmd>cclose<CR>')
 
 -- Swap search word-direction keys
 vim.keymap.set('n', '*', '#')
@@ -116,6 +117,7 @@ vim.cmd('packadd mini.nvim')
 
 require('mini.deps').setup({ path = { package = path_package } })
 require('plug.lsp')
+require('plug.ts')
 require('plug.fzf')
 require('plug.oil')
 
