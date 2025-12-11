@@ -109,7 +109,7 @@ if not vim.loop.fs_stat(mini_path) then
     'git', 'clone', '--filter=blob:none',
     'https://github.com/echasnovski/mini.nvim', mini_path
   })
-  vim.cmd('packadd mini.nvim | helptags ALL')
+  vim.cmd('helptags ALL')
 end
 
 require('mini.deps').setup({ path = { package = path_package } })

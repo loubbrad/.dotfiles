@@ -1,10 +1,12 @@
 MiniDeps.add({ source = 'neovim/nvim-lspconfig' })
 
-require('mini.format').setup({
-    formatters = {
-        python = { command = 'black', args = { '-l 80', '-' }, stdin = true },
-    },
-    fallback_to_lsp = false, 
+vim.api.nvim_create_autocmd("BufWritePre", {
+    pattern = "*.py",
+    callback = function()
+        local view = vim.fn.winsaveview()
+        vim.cmd(':%!black -q -l 80 -') 
+        vim.fn.winrestview(view)
+    end,
 })
 
 vim.api.nvim_create_autocmd('LspAttach', {
