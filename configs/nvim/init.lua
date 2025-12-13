@@ -30,8 +30,8 @@ vim.opt.fillchars = { vert = "│" }
 vim.opt.splitright = true
 vim.opt.laststatus = 3
 vim.keymap.set('n', '<leader>w', '<C-w>', { noremap = true })
-vim.keymap.set('n', '<leader><Tab>', '<cmd>wincmd w<CR>')
-vim.keymap.set('n', '<leader><leader>', function()
+vim.keymap.set('n', '<leader><leader>', '<cmd>wincmd w<CR>')
+vim.keymap.set('n', '<leader><Tab>', function()
     pcall(vim.cmd, 'b#')
 end)
 
