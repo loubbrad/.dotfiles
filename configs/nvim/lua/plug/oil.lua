@@ -1,25 +1,20 @@
 MiniDeps.add('stevearc/oil.nvim')
--- MiniDeps.add('nvim-tree/nvim-web-devicons')
 
 local function smart_enter()
     local oil = require("oil")
     local entry = oil.get_cursor_entry()
 
-    if not entry or entry.type == "directory" then
-        oil.select()
-        return
-    end
-
-    local path = oil.get_current_dir() .. entry.name
-    if #vim.api.nvim_list_wins() > 1 then
-        vim.cmd("wincmd p")
-    end
     vim.cmd("edit " .. vim.fn.fnameescape(path))
 end
 
 require("oil").setup({
     default_file_explorer = true,
     view_options = { show_hidden = true },
+    git = {
+        add = true,
+        mv = true,
+        rm = true,
+    },
     keymaps = {
         ["<CR>"] = { callback = smart_enter, desc = "Smart Open" },
     }

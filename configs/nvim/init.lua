@@ -124,4 +124,5 @@ require('plug.lsp')
 require('plug.ts')
 require('plug.fzf')
 require('plug.oil')
+require('plug.git')
 
