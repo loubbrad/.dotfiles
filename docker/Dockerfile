@@ -1,7 +1,7 @@
 FROM nvidia/cuda:12.5.0-devel-ubuntu22.04
 
 RUN apt-get update && apt-get install -y \
-    zsh tmux git curl wget xclip gnupg fzf fd-find silversearcher-ag sudo ffmpeg nvtop
+    zsh tmux git curl wget gnupg fzf fd-find silversearcher-ag ripgrep sudo ffmpeg nvtop
 
 ARG USERNAME=louis
 ARG UID=1000
