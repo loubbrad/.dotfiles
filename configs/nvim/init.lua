@@ -29,6 +29,8 @@ vim.opt.undolevels = 100
 vim.opt.fillchars = { vert = "│" }
 vim.opt.splitright = true
 vim.opt.laststatus = 3
+vim.keymap.set('n', ']b', '<cmd>bnext<CR>')
+vim.keymap.set('n', '[b', '<cmd>bprev<CR>')
 vim.keymap.set('n', '<leader>w', '<C-w>', { noremap = true })
 vim.keymap.set('n', '<leader><leader>', '<cmd>wincmd w<CR>')
 vim.keymap.set('n', '<leader><Tab>', function()
