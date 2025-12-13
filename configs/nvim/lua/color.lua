@@ -71,6 +71,8 @@ function M.setup()
         ["@lsp.type.selfParameter"] = { link = "@variable.builtin" }, 
         ["@lsp.type.clsParameter"]  = { link = "@variable.builtin" }, 
         ["@lsp.type.decorator"] = { link = "@attribute" },
+        ["@lsp.mod.readonly"] = { link = "@constant" },
+        ["@lsp.typemod.variable.readonly"] = { link = "@constant" },
     }
 
     for group, colors in pairs(highlights) do
