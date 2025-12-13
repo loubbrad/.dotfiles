@@ -35,7 +35,7 @@ fi
 
 install_tools() {
     echo "> Installing base tools: zsh, tmux, git, curl, wget, gnupg, fd, ag, ripgrep..."
-    eval $PKG_INSTALL zsh tmux git curl wget gnupg fzf fd-find silversearcher-ag ripgrep
+    eval $PKG_INSTALL zsh tmux git curl wget gnupg fd-find silversearcher-ag ripgrep
     git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
     ~/.fzf/install --all
 }
