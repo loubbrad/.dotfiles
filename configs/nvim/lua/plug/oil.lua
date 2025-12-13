@@ -10,11 +10,6 @@ end
 require("oil").setup({
     default_file_explorer = true,
     view_options = { show_hidden = true },
-    git = {
-        add = true,
-        mv = true,
-        rm = true,
-    },
     keymaps = {
         ["<CR>"] = { callback = smart_enter, desc = "Smart Open" },
     }
