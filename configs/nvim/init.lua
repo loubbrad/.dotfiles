@@ -6,12 +6,12 @@ vim.opt.shiftwidth = 4
 vim.opt.expandtab = true
 vim.g.mapleader = " "
 
-vim.cmd('colorscheme torte')
-vim.api.nvim_set_hl(0, "StatusLine", { link = "Normal" })
-vim.api.nvim_set_hl(0, "StatusLineNC", { link = "Normal" })
-
+require('color').setup()
 vim.opt.colorcolumn = "80"
 vim.api.nvim_set_hl(0, "ColorColumn", { bg = "#2a2a2a" }) 
+vim.api.nvim_set_hl(0, "StatusLine", { link = "Normal" })
+vim.api.nvim_set_hl(0, "StatusLineNC", { link = "Normal" })
+vim.api.nvim_set_hl(0, "WinSeparator", { fg = "#444444" })
 
 -- Cache history
 local undo_dir = vim.fn.stdpath('cache') .. '/undo'
@@ -26,11 +26,14 @@ vim.opt.undofile = true
 vim.opt.undolevels = 100
 
 -- Window qol
-vim.opt.fillchars = {vert = " "}
+vim.opt.fillchars = { vert = "│" }
 vim.opt.splitright = true
 vim.opt.laststatus = 3
 vim.keymap.set('n', '<leader>w', '<C-w>', { noremap = true })
-vim.keymap.set('n', '<leader><Tab>', '<cmd>b#<CR>')
+vim.keymap.set('n', '<leader><Tab>', '<cmd>wincmd w<CR>')
+vim.keymap.set('n', '<leader><leader>', function()
+    pcall(vim.cmd, 'b#')
+end)
 
 -- Paste without overwriting register
 vim.keymap.set('x', '<leader>p', '"_dP')

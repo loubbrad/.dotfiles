@@ -19,13 +19,26 @@ vim.api.nvim_create_autocmd('LspAttach', {
 })
 
 local capabilities = vim.lsp.protocol.make_client_capabilities()
-local servers = { 'pyright' }
+local servers = { 'basedpyright', 'lua_ls' }
 
 for _, server in ipairs(servers) do
   if vim.fn.executable(server) == 1 then
-    vim.lsp.config(server, {
+    local config = {
       capabilities = capabilities,
-    })
+    }
+
+    if server == 'basedpyright' then
+      config.settings = {
+        basedpyright = {
+          analysis = {
+            typeCheckingMode = "off", 
+          },
+        },
+      }
+    end
+
+    vim.lsp.config(server, config)
     vim.lsp.enable(server)
   end
 end
+
