@@ -28,16 +28,14 @@ if command -v apt >/dev/null 2>&1; then
     PKG_INSTALL="sudo apt update && sudo apt install -y"
 elif command -v yum >/dev/null 2>&1; then
     PKG_INSTALL="sudo yum install -y"
-elif command -v pacman >/dev/null 2>&1; then
-    PKG_INSTALL="sudo pacman -S --noconfirm"
 else
-    echo "Error: Could not find a supported package manager (apt, yum, pacman)." >&2
+    echo "Error: Could not find a supported package manager (apt, yum)." >&2
     exit 1
 fi
 
 install_tools() {
-    echo "> Installing base tools: zsh, tmux, git, curl, wget, xclip, gnupg, fzf, fd, ag, ripgrep..."
-    eval $PKG_INSTALL zsh tmux git curl wget xclip gnupg fzf fd-find silversearcher-ag ripgrep
+    echo "> Installing base tools: zsh, tmux, git, curl, wget, gnupg, fzf, fd, ag, ripgrep..."
+    eval $PKG_INSTALL zsh tmux git curl wget gnupg fzf fd-find silversearcher-ag ripgrep
 }
 
 install_neovim() {
@@ -89,7 +87,8 @@ link_configs() {
     ln -sfnT "$DOTFILES_DIR/configs/nvim" "$HOME/.config/nvim"
     echo " - Linked init.lua"
 
-    sudo ln -sfn "$DOTFILES_DIR/configs/key-bindings.zsh" "/usr/share/doc/fzf/examples/key-bindings.zsh"
+    mkdir -p "$HOME/.config/zsh"
+    ln -sfn "$DOTFILES_DIR/configs/key-bindings.zsh" "$HOME/.config/zsh/key-bindings.zsh"
     echo " - Linked key-bindings.zsh"
 }
 
@@ -102,19 +101,31 @@ install_ssh() {
         return 1
     fi
 
-    mkdir -p -m 700 "$HOME/.ssh"
+    local temp_ssh_dir
+    temp_ssh_dir=$(mktemp -d)
 
-    echo " - Decrypting archive (you will be prompted for the passphrase)..."
-    if gpg --decrypt "$encrypted_archive" 2>/dev/null | tar -xz -C "$HOME/.ssh"; then
+    echo " - Decrypting archive..."
+    if gpg --decrypt "$encrypted_archive" 2>/dev/null | tar -xz -C "$temp_ssh_dir"; then
+        
+        if [ -d "$HOME/.ssh" ]; then
+            echo " - Backing up existing .ssh to .ssh.bak..."
+            rm -rf "$HOME/.ssh.bak" 
+            mv "$HOME/.ssh" "$HOME/.ssh.bak"
+        fi
+
+        echo " - Installing new keys..."
+        mv "$temp_ssh_dir" "$HOME/.ssh"
+
         echo "  - Setting secure file permissions..."
         chmod 700 "$HOME/.ssh"
         chown -R "$USER:$USER" "$HOME/.ssh"
         find "$HOME/.ssh" -type f ! -name "*.pub" -exec chmod 600 {} +
         find "$HOME/.ssh" -type f -name "*.pub" -exec chmod 644 {} +
+        
         echo " - SSH keys installed successfully."
     else
-        echo " - Error: Decryption or extraction failed. Was the passphrase correct?" >&2
-        rm -rf "$HOME/.ssh"
+        echo " - Error: Decryption failed. No changes were made to existing SSH keys." >&2
+        rm -rf "$temp_ssh_dir"
         exit 1
     fi
 }

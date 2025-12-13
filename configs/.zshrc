@@ -56,7 +56,7 @@ zle -N zle-line-init
 echo -ne '\e[5 q' # Use beam shape cursor on startup.
 preexec() { echo -ne '\e[5 q' ;} # Use beam shape cursor for each new prompt.
 
-source /usr/share/doc/fzf/examples/key-bindings.zsh
+source "$HOME/.config/zsh/key-bindings.zsh"
 
 # Env specific shell settings
 if [[ -f "$HOME/.local/bin/env" ]]; then
