@@ -79,6 +79,7 @@ link_configs() {
     echo " - Linked .gitconfig"
 
     ln -sfn "$DOTFILES_DIR/configs/.zshrc" "$HOME/.zshrc"
+    $HOME/.fzf/install --all
     echo " - Linked .zshrc"
 
     ln -sfn "$DOTFILES_DIR/configs/.tmux.conf" "$HOME/.tmux.conf"
