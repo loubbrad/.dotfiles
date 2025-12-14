@@ -16,6 +16,7 @@ WORKDIR /home/$USERNAME
 ENV HOME=/home/$USERNAME
 ENV USER=$USERNAME
 
+ARG DOTFILES_HASH=latest
 RUN git clone https://github.com/loubbrad/.dotfiles ~/.dotfiles
 RUN bash ~/.dotfiles/init.sh --conda
 
