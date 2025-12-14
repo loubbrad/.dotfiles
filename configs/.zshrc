@@ -1,5 +1,9 @@
-# Personal config
-# See - https://gist.github.com/LukeSmithxyz/e62f26e55ea8b0ed41a65912fbebbe52
+# Adapted from https://gist.github.com/LukeSmithxyz/e62f26e55ea8b0ed41a65912fbebbe52
+
+if [[ "$TERM" == "xterm-ghostty" ]]; then
+    export TERM="xterm-256color"
+fi
+
 PROMPT='%n@%m %~ %# '
 export CDPATH=.:~/work
 export PATH="$PATH:$HOME/nvim/bin"
