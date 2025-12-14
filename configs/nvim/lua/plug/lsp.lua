@@ -1,4 +1,7 @@
 MiniDeps.add({ source = 'neovim/nvim-lspconfig' })
+MiniDeps.add({ source = 'hrsh7th/nvim-cmp' })
+MiniDeps.add({ source = 'hrsh7th/cmp-nvim-lsp' })
+MiniDeps.add({ source = 'hrsh7th/cmp-buffer' })
 
 vim.api.nvim_create_autocmd('LspAttach', {
     callback = function(event)
@@ -18,8 +21,8 @@ vim.api.nvim_create_autocmd('LspAttach', {
     end,
 })
 
-local capabilities = vim.lsp.protocol.make_client_capabilities()
-local servers = { 'basedpyright', 'lua_ls' }
+local capabilities = require('cmp_nvim_lsp').default_capabilities()
+local servers = { 'basedpyright' }
 
 for _, server in ipairs(servers) do
   if vim.fn.executable(server) == 1 then
@@ -41,4 +44,29 @@ for _, server in ipairs(servers) do
     vim.lsp.enable(server)
   end
 end
+
+local cmp = require('cmp')
+
+
+cmp.setup({
+  window = {
+    completion = {
+      max_height = 12,
+    },
+  },
+  completion = {
+    completeopt = 'menu,menuone,noinsert',  
+  },
+  mapping = cmp.mapping.preset.insert({
+    ['<C-n>'] = cmp.mapping.select_next_item(),
+    ['<C-p>'] = cmp.mapping.select_prev_item(),
+    ['<Tab>'] = cmp.mapping.confirm({ select = true }),
+    ['<CR>'] = cmp.mapping.confirm({ select = true }),  
+    ['<C-Space>'] = cmp.mapping.complete(),
+  }),
+  sources = {
+    { name = 'nvim_lsp' },
+    { name = 'buffer' },
+  },
+})
 
