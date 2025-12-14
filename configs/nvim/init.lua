@@ -25,6 +25,11 @@ vim.opt.undodir = undo_dir
 vim.opt.undofile = true
 vim.opt.undolevels = 100
 
+vim.keymap.set('n', '<C-/>', 'gcc', { remap = true })
+vim.keymap.set('n', '<C-_>', 'gcc', { remap = true }) 
+vim.keymap.set('x', '<C-/>', 'gc', { remap = true })
+vim.keymap.set('x', '<C-_>', 'gc', { remap = true }) 
+
 -- Window qol
 vim.opt.fillchars = { vert = "│" }
 vim.opt.splitright = true
