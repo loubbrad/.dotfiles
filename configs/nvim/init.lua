@@ -122,6 +122,7 @@ end
 vim.cmd('packadd mini.nvim')
 
 require('mini.deps').setup({ path = { package = path_package } })
+require('plug.format')
 require('plug.lsp')
 require('plug.ts')
 require('plug.fzf')
