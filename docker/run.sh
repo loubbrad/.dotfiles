@@ -6,12 +6,23 @@ docker_args=(
     --user $(id -u):$(id -g)
 )
 
-if [ -d "$HOME/work" ]; then
-    docker_args+=(-v "$HOME/work:/home/$(whoami)/work")
-fi
+mount_volumes=false
+for arg in "$@"; do
+    if [[ "$arg" == "-m" || "$arg" == "--mount" ]]; then
+        mount_volumes=true
+        break
+    fi
+done
 
-if [ -d "$HOME/miniconda3" ]; then
-    docker_args+=(-v "$HOME/miniconda3:/home/$(whoami)/miniconda3")
+if [ "$mount_volumes" = true ]; then
+    if [ -d "$HOME/work" ]; then
+        docker_args+=(-v "$HOME/work:/home/$(whoami)/work")
+    fi
+
+    if [ -d "$HOME/miniconda3" ]; then
+        docker_args+=(-v "$HOME/miniconda3:/home/$(whoami)/miniconda3")
+    fi
 fi
 
 docker run "${docker_args[@]}" dev
+
