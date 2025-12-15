@@ -19,6 +19,7 @@ vim.api.nvim_create_autocmd('LspAttach', {
         vim.keymap.set('n', 'gd', function() require('fzf-lua').lsp_definitions() end, opts)
         vim.keymap.set('n', '<leader>gd', function() _G.smart_split_action(function() require('fzf-lua').lsp_definitions() end) end, opts)
         vim.keymap.set('n', 'gr', function() require('fzf-lua').lsp_references() end, opts)
+        vim.keymap.set('n', '<leader>gr', function() _G.smart_split_action(function() require('fzf-lua').lsp_references() end) end, opts)
         vim.keymap.set('n', '<leader>rn', vim.lsp.buf.rename, opts)  
         vim.keymap.set('n', '<C-h>', vim.lsp.buf.hover, opts)
         vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, opts)
