@@ -2,6 +2,13 @@ MiniDeps.add('ibhagwan/fzf-lua')
 local fzf = require('fzf-lua')
 local actions = require('fzf-lua.actions')
 
+local function copy_abs_path(selected)
+    local file = require('fzf-lua.path').entry_to_file(selected[1])
+    local abs_path = vim.fn.fnamemodify(file.path, ":p")
+    vim.fn.setreg("+", abs_path)
+    vim.notify("Copied: " .. abs_path)
+end
+
 local function smart_split(selected, opts)
     _G.smart_split_action(function()
         actions.file_edit(selected, opts)
@@ -12,15 +19,18 @@ fzf.setup({
     actions = {
         files = {
             ["default"] = actions.file_edit, 
-            ["ctrl-s"]  = smart_split,       
+            ["ctrl-s"]  = smart_split,
+            ["ctrl-y"]  = copy_abs_path,  
         },
         grep = {
             ["default"] = actions.file_edit,
             ["ctrl-s"]  = smart_split,
+            ["ctrl-y"]  = copy_abs_path,  
         },
         buffers = {
             ["default"] = actions.file_edit,
             ["ctrl-s"]  = smart_split,
+            ["ctrl-y"]  = copy_abs_path,  
         }
     }
 })
