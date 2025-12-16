@@ -6,6 +6,10 @@ vim.opt.shiftwidth = 4
 vim.opt.expandtab = true
 vim.g.mapleader = " "
 
+vim.opt.spell = true
+vim.opt.spelllang = "en_us"
+vim.opt.spelloptions = "camel"
+
 require('color').setup()
 vim.opt.colorcolumn = "80"
 vim.api.nvim_set_hl(0, "ColorColumn", { bg = "#2a2a2a" }) 
