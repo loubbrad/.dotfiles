@@ -144,10 +144,10 @@ end
 vim.cmd('packadd mini.nvim')
 
 require('mini.deps').setup({ path = { package = path_package } })
-require('plug.git')
-require('plug.ts')
-require('plug.oil')
-require('plug.format')
-require('plug.lsp')
-require('plug.fzf')
+require('plugin.git')
+require('plugin.treesitter')
+require('plugin.oil')
+require('plugin.format')
+require('plugin.lsp')
+require('plugin.fzf')
 
