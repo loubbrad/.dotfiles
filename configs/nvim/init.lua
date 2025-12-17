@@ -29,13 +29,15 @@ vim.opt.undodir = undo_dir
 vim.opt.undofile = true
 vim.opt.undolevels = 100
 
+vim.diagnostic.config({ signs = false, virtual_text = false })
+
 vim.keymap.set('n', '<C-/>', 'gcc', { remap = true })
 vim.keymap.set('n', '<C-_>', 'gcc', { remap = true }) 
 vim.keymap.set('x', '<C-/>', 'gc', { remap = true })
 vim.keymap.set('x', '<C-_>', 'gc', { remap = true }) 
 
 -- Window qol
-vim.opt.fillchars = { vert = "│" }
+vim.opt.fillchars = { vert = "|" }
 vim.opt.splitright = true
 vim.opt.laststatus = 3
 vim.keymap.set('n', ']b', '<cmd>bnext<CR>')
@@ -142,10 +144,10 @@ end
 vim.cmd('packadd mini.nvim')
 
 require('mini.deps').setup({ path = { package = path_package } })
+require('plug.git')
+require('plug.ts')
+require('plug.oil')
 require('plug.format')
 require('plug.lsp')
-require('plug.ts')
 require('plug.fzf')
-require('plug.oil')
-require('plug.git')
 

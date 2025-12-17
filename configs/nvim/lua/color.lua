@@ -27,7 +27,7 @@ function M.setup()
         ["DiagnosticWarn"]     = { fg = c.vscYellow },
         ["DiagnosticInfo"]     = { fg = c.vscBlue },
         ["DiagnosticHint"]     = { fg = c.vscBlue },
-        ["DiagnosticUnderlineError"] = { sp = c.vscRed, undercurl = true },
+        ["DiagnosticUnderlineError"] = { fg = c.vscRed, underline = true },
         ["@variable"]          = { link = "Normal" }, 
         ["@variable.member"]   = { link = "Normal" }, 
         ["@variable.parameter"]= { link = "Normal" },
