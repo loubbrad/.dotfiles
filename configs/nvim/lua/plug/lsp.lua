@@ -1,9 +1,9 @@
 MiniDeps.add({ source = 'neovim/nvim-lspconfig' })
 MiniDeps.add({
-    source = 'Saghen/blink.cmp',
-    depends = { 'rafamadriz/friendly-snippets' },
-    checkout = 'v1.8.0',
+  source = 'saghen/blink.cmp',
+  depends = { 'rafamadriz/friendly-snippets' },
 })
+
 
 require('blink.cmp').setup({
     keymap = {
@@ -12,7 +12,7 @@ require('blink.cmp').setup({
         ['<Tab>'] = { 'select_next', 'fallback' },
         ['<C-l>'] = { 'show_signature', 'hide_signature', 'fallback' },
     },
-    --- fuzzy = { implementation = "lua" },
+    fuzzy = { implementation = "lua" },
     signature = { enabled = true },
     completion = {
         accept = { auto_brackets = { enabled = true } },
