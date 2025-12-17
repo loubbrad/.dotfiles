@@ -12,7 +12,11 @@ require('blink.cmp').setup({
         ['<Tab>'] = { 'select_next', 'fallback' },
         ['<C-l>'] = { 'show_signature', 'hide_signature', 'fallback' },
     },
-    fuzzy = { implementation = "lua" },
+    -- Workaround to download rust binary
+    fuzzy = {
+        implementation = "prefer_rust_with_warning",
+        prebuilt_binaries = { force_version = "v1.8.0" },  -- Manually update
+    },
     signature = { enabled = true },
     completion = {
         accept = { auto_brackets = { enabled = true } },
