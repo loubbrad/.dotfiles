@@ -6,9 +6,9 @@ fi
 
 PROMPT='%n@%m %~ %# '
 export CDPATH=.:~/work
-export PATH="$PATH:$HOME/nvim/bin"
+export PATH="$HOME/.local/bin:$PATH"
 
-# History in cache directory:
+# History in cache directory
 HISTSIZE=10000
 SAVEHIST=10000
 HISTFILE=~/.cache/zsh/history
@@ -22,10 +22,12 @@ export EDITOR=nvim
 export VISUAL=nvim
 
 # FZF
-export FZF_DEFAULT_COMMAND='ag -g .'
+export FZF_DEFAULT_COMMAND='ag -g ""'
 export FZF_CTRL_T_COMMAND='fdfind'
+source "$HOME/.config/zsh/key-bindings.zsh"
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
-# Basic auto/tab complete:
+# Basic auto/tab complete
 autoload -U compinit
 zstyle ':completion:*' menu select
 zmodload zsh/complist
@@ -59,8 +61,6 @@ zle-line-init() {
 zle -N zle-line-init
 echo -ne '\e[5 q' # Use beam shape cursor on startup.
 preexec() { echo -ne '\e[5 q' ;} # Use beam shape cursor for each new prompt.
-
-source "$HOME/.config/zsh/key-bindings.zsh"
 
 # Env specific shell settings
 if [[ -f "$HOME/.local/bin/env" ]]; then

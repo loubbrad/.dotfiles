@@ -1,10 +1,14 @@
 MiniDeps.add({
   source = 'nvim-treesitter/nvim-treesitter',
-  checkout = 'master',  -- Removing this breaks install
-  monitor = 'main',
+  checkout = 'main',
+  hooks = { post_checkout = function() vim.cmd('TSUpdate') end },
 })
-require('nvim-treesitter.configs').setup({
-  ensure_installed = { "python", "lua", "bash" },
-  highlight = { enable = true },
+local ts = require('nvim-treesitter')
+ts.install({ "python", "lua", "bash" }, { summary = false })
+
+vim.api.nvim_create_autocmd('FileType', {
+  callback = function(args)
+    pcall(vim.treesitter.start, args.buf, args.match)
+  end,
 })
 

@@ -36,33 +36,46 @@ fi
 install_tools() {
     echo "> Installing base tools: zsh, tmux, git, curl, wget, gnupg, fd, ag, ripgrep..."
     eval $PKG_INSTALL zsh tmux git curl wget gnupg fd-find silversearcher-ag ripgrep
-
-    # FZF needs new version
-    [ -d "$HOME/.fzf" ] || git clone --depth 1 https://github.com/junegunn/fzf.git "$HOME/.fzf"
 }
 
-install_neovim() {
-    if command -v nvim >/dev/null 2>&1; then
-        return
-    fi
-    
+install_binaries() {
     SYSTEM_GLIBC=$(ldd --version | head -n1 | grep -oE '[0-9]+\.[0-9]+' | head -n1)
     REQUIRED_GLIBC="2.33"
 
-    # Compare required versions
+    NVIM_URL="https://github.com/neovim/neovim/releases/latest/download/nvim-linux-x86_64.tar.gz"
+    TREE_SITTER_URL="https://github.com/tree-sitter/tree-sitter/releases/latest/download/tree-sitter-linux-x64.gz"
+    
+    # Check GLIBC
     if [ "$(printf '%s\n' "$REQUIRED_GLIBC" "$SYSTEM_GLIBC" | sort -V | head -n1)" = "$SYSTEM_GLIBC" ] && [ "$SYSTEM_GLIBC" != "$REQUIRED_GLIBC" ]; then
-        echo "> System GLIBC ($SYSTEM_GLIBC) is older than required ($REQUIRED_GLIBC)."
-        echo "> Installing fallback Neovim (static/older GLIBC support)..."
+        echo "> System GLIBC ($SYSTEM_GLIBC) is older than required ($REQUIRED_GLIBC). Using fallback binaries."
         NVIM_URL="https://github.com/neovim/neovim-releases/releases/download/v0.11.5/nvim-linux-x86_64.tar.gz"
-    else
-        echo "> Installing Neovim..."
-        NVIM_URL="https://github.com/neovim/neovim/releases/latest/download/nvim-linux-x86_64.tar.gz"
+        TREE_SITTER_URL="https://github.com/tree-sitter/tree-sitter/releases/download/v0.24.7/tree-sitter-linux-x64.gz"
     fi
 
-    mkdir -p "$HOME/nvim"
-    curl -LO "$NVIM_URL"
-    tar -C "$HOME/nvim" -xzf nvim-linux-x86_64.tar.gz --strip-components=1
-    rm nvim-linux-x86_64.tar.gz
+    if ! command -v nvim >/dev/null 2>&1; then
+        echo "> Installing Neovim..."
+        mkdir -p "$HOME/nvim"
+        curl -L "$NVIM_URL" -o nvim.tar.gz
+        tar -C "$HOME/nvim" -xzf nvim.tar.gz --strip-components=1
+        rm nvim.tar.gz
+        ln -sf "$HOME/nvim/bin/nvim" "$HOME/.local/bin/nvim"
+    fi
+
+    if ! command -v fzf >/dev/null 2>&1; then
+        echo "> Installing FZF..."
+        git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
+        ~/.fzf/install --all --no-update-rc 
+    fi
+
+    if ! command -v tree-sitter >/dev/null 2>&1; then
+        echo "> Installing Tree-sitter..."
+        curl -L "$TREE_SITTER_URL" -o tree-sitter.gz
+        gzip -d tree-sitter.gz
+        chmod +x tree-sitter
+        mv tree-sitter "$HOME/.local/bin/tree-sitter"
+    fi
+
+    echo "> Binary installation complete."
 }
 
 install_miniconda() {
@@ -136,26 +149,21 @@ install_ssh() {
 main() {
     mkdir -p "$HOME/work"
     mkdir -p "$HOME/.cache/zsh"
+    mkdir -p "$HOME/.local/bin"
 
     install_tools
-    install_neovim
+    install_binaries
+    link_configs
 
     if [ "$INSTALL_CONDA" = true ]; then
         install_miniconda
-    fi
-
-    link_configs
-    $HOME/.fzf/install --all
-
-    if [ "$INSTALL_SSH" = true ]; then
-        install_ssh
-    fi
-
-    if [ "$INSTALL_CONDA" = true ]; then
-        echo "> Initializing conda..."
         "$HOME/miniconda3/bin/conda" init zsh
         "$HOME/miniconda3/bin/conda" init bash
         SHELL_RESTART_REQUIRED=true
+    fi
+
+    if [ "$INSTALL_SSH" = true ]; then
+        install_ssh
     fi
 
     # Change default shell if not already zsh
