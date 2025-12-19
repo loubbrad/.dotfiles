@@ -4,25 +4,26 @@ MiniDeps.add({
   depends = { 'rafamadriz/friendly-snippets' },
 })
 
-
 require('blink.cmp').setup({
     keymap = {
         preset = 'default',
-        ['<CR>'] = { 'accept', 'fallback' },
-        ['<Tab>'] = { 'select_next', 'fallback' },
+        ['<CR>']  = { 'accept', 'fallback' },
+        ['<Tab>'] = { 'accept', 'fallback' },
+        ['<C-j>'] = { 'select_next', 'fallback' },
+        ['<C-k>'] = { 'select_prev', 'fallback' },
         ['<C-l>'] = { 'show_signature', 'hide_signature', 'fallback' },
     },
     -- Workaround to download rust binary
     fuzzy = {
         implementation = "prefer_rust_with_warning",
-        prebuilt_binaries = { force_version = "v1.8.0" },  -- Manually update
+        prebuilt_binaries = { force_version = "v1.8.0" },
     },
     signature = { enabled = true },
     completion = {
         accept = { auto_brackets = { enabled = true } },
         keyword = { range = 'full' },
         documentation = {
-            auto_show = true,  
+            auto_show = true,
             auto_show_delay_ms = 200,
         },
     },

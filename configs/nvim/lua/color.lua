@@ -38,17 +38,13 @@ function M.setup()
         ["@function.call"]     = { fg = c.vscYellow },
         ["@function.builtin"]  = { fg = c.vscYellow },
         ["@attribute"]         = { fg = c.vscYellow }, 
-        ["@keyword"]           = { fg = c.vscBlue },
+        ["@keyword"]           = { fg = c.vscPink },
         ["@keyword.function"]  = { fg = c.vscBlue },
         ["@keyword.operator"]  = { fg = c.vscBlue },
         ["@boolean"]           = { fg = c.vscBlue },
         ["@constant"]          = { fg = c.vscBlue },
         ["@constant.builtin"]  = { fg = c.vscBlue }, 
         ["@variable.builtin"]  = { fg = c.vscBlue }, 
-        ["@keyword.return"]    = { fg = c.vscPink },
-        ["@keyword.conditional"]= { fg = c.vscPink },
-        ["@keyword.repeat"]    = { fg = c.vscPink },
-        ["@keyword.import"]    = { fg = c.vscPink }, 
         ["@include"]           = { fg = c.vscPink }, 
         ["@exception"]         = { fg = c.vscPink },
         ["@constructor"]       = { fg = c.vscBlueGreen },
@@ -77,6 +73,7 @@ function M.setup()
         ["@lsp.type.decorator"] = { link = "@attribute" },
         ["@lsp.mod.readonly"] = { link = "@constant" },
         ["@lsp.typemod.variable.readonly"] = { link = "@constant" },
+        ["@keyword.operator.python"]  = { fg = c.vscBlue },
     }
 
     for group, colors in pairs(highlights) do
