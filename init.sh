@@ -20,7 +20,12 @@ done
 
 
 if [ "$(uname -m)" != "x86_64" ]; then
-    echo "This script only supports the x86_64 architecture." >&2
+    echo "This script only supports linux-x86_64." >&2
+    exit 1
+fi
+
+if [ -z "${BASH_VERSION:-}" ]; then
+    echo "This script must be run with bash." >&2
     exit 1
 fi
 
