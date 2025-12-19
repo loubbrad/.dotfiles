@@ -1,6 +1,7 @@
 #!/bin/bash
 set -e 
 
+SYSTEM_GLIBC=$(ldd --version | head -n1 | grep -oE '[0-9]+\.[0-9]+' | head -n1)
 DOTFILES_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &> /dev/null && pwd)
 INSTALL_CONDA=false
 INSTALL_SSH=false
@@ -43,17 +44,23 @@ install_tools() {
     eval $PKG_INSTALL zsh tmux git curl wget gnupg fd-find silversearcher-ag ripgrep
 }
 
-install_binaries() {
-    SYSTEM_GLIBC=$(ldd --version | head -n1 | grep -oE '[0-9]+\.[0-9]+' | head -n1)
-    REQUIRED_GLIBC="2.33"
+glibc_at_least() {
+    # returns 0 if system glibc >= required
+    [ "$(printf '%s\n' "$1" "$SYSTEM_GLIBC" | sort -V | tail -n1)" = "$SYSTEM_GLIBC" ]
+}
 
-    NVIM_URL="https://github.com/neovim/neovim/releases/latest/download/nvim-linux-x86_64.tar.gz"
-    TREE_SITTER_URL="https://github.com/tree-sitter/tree-sitter/releases/latest/download/tree-sitter-linux-x64.gz"
-    
-    # Check GLIBC
-    if [ "$(printf '%s\n' "$REQUIRED_GLIBC" "$SYSTEM_GLIBC" | sort -V | head -n1)" = "$SYSTEM_GLIBC" ] && [ "$SYSTEM_GLIBC" != "$REQUIRED_GLIBC" ]; then
-        echo "> System GLIBC ($SYSTEM_GLIBC) is older than required ($REQUIRED_GLIBC). Using fallback binaries."
+install_binaries() {
+    if glibc_at_least 2.33; then
+        NVIM_URL="https://github.com/neovim/neovim/releases/latest/download/nvim-linux-x86_64.tar.gz"
+    else
+        echo "> GLIBC $SYSTEM_GLIBC too old for latest neovim, using fallback"
         NVIM_URL="https://github.com/neovim/neovim-releases/releases/download/v0.11.5/nvim-linux-x86_64.tar.gz"
+    fi
+
+    if glibc_at_least 2.39; then
+        TREE_SITTER_URL="https://github.com/tree-sitter/tree-sitter/releases/latest/download/tree-sitter-linux-x64.gz"
+    else
+        echo "> GLIBC $SYSTEM_GLIBC too old for latest tree-sitter, using fallback"
         TREE_SITTER_URL="https://github.com/tree-sitter/tree-sitter/releases/download/v0.24.7/tree-sitter-linux-x64.gz"
     fi
 
