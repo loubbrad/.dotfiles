@@ -38,6 +38,8 @@ _comp_options+=(globdots) # Include hidden files.
 bindkey -v
 bindkey "^H" backward-delete-char
 bindkey "^?" backward-delete-char
+bindkey '^k' up-line-or-history
+bindkey '^j' down-line-or-history
 export KEYTIMEOUT=1
 autoload edit-command-line; zle -N edit-command-line
 
@@ -66,3 +68,21 @@ preexec() { echo -ne '\e[5 q' ;} # Use beam shape cursor for each new prompt.
 if [[ -f "$HOME/.local/bin/env" ]]; then
   . "$HOME/.local/bin/env"
 fi
+
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+
+# >>> conda initialize >>>
+# !! Contents within this block are managed by 'conda init' !!
+__conda_setup="$('/home/loubb/miniconda3/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
+if [ $? -eq 0 ]; then
+    eval "$__conda_setup"
+else
+    if [ -f "/home/loubb/miniconda3/etc/profile.d/conda.sh" ]; then
+        . "/home/loubb/miniconda3/etc/profile.d/conda.sh"
+    else
+        export PATH="/home/loubb/miniconda3/bin:$PATH"
+    fi
+fi
+unset __conda_setup
+# <<< conda initialize <<<
+
