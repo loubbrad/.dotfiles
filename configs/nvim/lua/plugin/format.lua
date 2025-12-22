@@ -1,16 +1,14 @@
 MiniDeps.add({ source = 'stevearc/conform.nvim' })
-
 require("conform").setup({
     formatters_by_ft = {
-        python = { "black" },
+        python = { "ruff_format" },
     },
     format_on_save = {
-        timeout_ms = 1000,        
-        -- lsp_format = "fallback", 
+        timeout_ms = 1000,
     },
     formatters = {
-        black = {
-            prepend_args = { "--line-length", "80" },
+        ruff_format = {
+            append_args = { "--line-length", "80" },
         },
     },
 })

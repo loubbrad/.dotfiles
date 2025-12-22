@@ -62,6 +62,7 @@ for _, server in ipairs(servers) do
                 basedpyright = {
                     analysis = {
                         typeCheckingMode = "off",
+                        diagnosticMode = "openFilesOnly",
                     },
                 },
             }
