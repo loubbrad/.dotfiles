@@ -57,6 +57,11 @@ vim.keymap.set({'n', 'v'}, '<leader>y', '"+y')
 -- Delete to black hole register
 vim.keymap.set({'n', 'v'}, '<leader>d', '"_d')
 
+-- Yank current file path
+vim.keymap.set("n", "<leader>fp", function()
+  vim.fn.setreg("+", vim.fn.expand("%:p"))
+end)
+
 -- Center after jump
 vim.keymap.set('n', '<C-u>', '<C-u>zz')
 vim.keymap.set('n', '<C-d>', '<C-d>zz')

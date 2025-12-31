@@ -49,7 +49,7 @@ vim.api.nvim_create_autocmd('LspAttach', {
 })
 
 local capabilities = require('blink.cmp').get_lsp_capabilities()
-local servers = { 'basedpyright' }
+local servers = { 'ty', 'basedpyright' }
 
 for _, server in ipairs(servers) do
     if vim.fn.executable(server) == 1 then
@@ -66,7 +66,14 @@ for _, server in ipairs(servers) do
                     },
                 },
             }
-        end
+
+        elseif server == 'ty' then
+            config.settings = {
+                ty = {
+                    -- diagnosticMode = "off"
+                }
+            }
+end
 
     vim.lsp.config(server, config)
     vim.lsp.enable(server)
