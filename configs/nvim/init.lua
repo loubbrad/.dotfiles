@@ -123,6 +123,10 @@ vim.keymap.set('n', '<leader>gd', function()
   _G.smart_split_action(function() vim.cmd('normal! gd') end)
 end)
 
+vim.keymap.set('n', '<leader>gf', function()
+  _G.smart_split_action(function() vim.cmd('normal! gf') end)
+end)
+
 vim.keymap.set('n', '<leader>#', function()
   _G.smart_split_action(function() vim.cmd('normal! *') end)
 end)
