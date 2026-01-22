@@ -6,6 +6,7 @@ DOTFILES_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &> /dev/null && pwd)
 INSTALL_CONDA=false
 INSTALL_SSH=false
 SHELL_RESTART_REQUIRED=false
+NO_ROOT=false
 
 for arg in "$@"; do
   case $arg in
@@ -14,6 +15,10 @@ for arg in "$@"; do
       ;;
     --ssh)
       INSTALL_SSH=true
+      shift
+      ;;
+    --no-root)
+      NO_ROOT=true
       shift
       ;;
   esac
@@ -57,11 +62,9 @@ install_binaries() {
         NVIM_URL="https://github.com/neovim/neovim-releases/releases/download/v0.11.5/nvim-linux-x86_64.tar.gz"
     fi
 
-    if glibc_at_least 2.39; then
-        TREE_SITTER_URL="https://github.com/tree-sitter/tree-sitter/releases/latest/download/tree-sitter-linux-x64.gz"
-    else
-        echo "> GLIBC $SYSTEM_GLIBC too old for latest tree-sitter, using fallback"
-        TREE_SITTER_URL="https://github.com/tree-sitter/tree-sitter/releases/download/v0.24.7/tree-sitter-linux-x64.gz"
+    TREE_SITTER_URL=""
+    if glibc_at_least 2.34; then
+        TREE_SITTER_URL="https://github.com/tree-sitter/tree-sitter/releases/download/v0.25.10/tree-sitter-linux-x64.gz"
     fi
 
     if ! command -v nvim >/dev/null 2>&1; then
@@ -79,7 +82,7 @@ install_binaries() {
         ~/.fzf/install --all --no-update-rc 
     fi
 
-    if ! command -v tree-sitter >/dev/null 2>&1; then
+    if [ -n "$TREE_SITTER_URL" ] && ! command -v tree-sitter >/dev/null 2>&1; then
         echo "> Installing Tree-sitter..."
         curl -L "$TREE_SITTER_URL" -o tree-sitter.gz
         gzip -d tree-sitter.gz
@@ -163,7 +166,9 @@ main() {
     mkdir -p "$HOME/.cache/zsh"
     mkdir -p "$HOME/.local/bin"
 
-    install_tools
+    if [ "$NO_ROOT" = false ]; then
+        install_tools
+    fi
     install_binaries
     link_configs
 
@@ -179,7 +184,7 @@ main() {
     fi
 
     # Change default shell if not already zsh
-    if [[ "$SHELL" != */zsh ]]; then
+    if [ "$NO_ROOT" = false ] && [[ "$SHELL" != */zsh ]]; then
         echo "> Changing shell to zsh..."
         sudo chsh -s "$(which zsh)" "$USER"
         SHELL_RESTART_REQUIRED=true
