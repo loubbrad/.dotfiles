@@ -89,6 +89,15 @@ end)
 vim.keymap.set('n', '<leader>dq', function()
   vim.diagnostic.setqflist({ open = true, bufnr = 0 })
 end)
+vim.keymap.set('n', '<C-q>', function()
+  local ok = pcall(vim.cmd, 'vimgrep // %')
+  if ok then
+    vim.cmd('copen')
+    vim.cmd('noh')
+  else
+    vim.notify('No previous search pattern', vim.log.levels.WARN)
+  end
+end)
 
 -- Swap search word-direction keys
 vim.keymap.set('n', '*', '#')
