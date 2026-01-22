@@ -16,6 +16,10 @@ local function smart_split(selected, opts)
 end
 
 fzf.setup({
+    winopts = {
+        border   = "single",
+        preview = { border = "single" },
+    },
     actions = {
         files = {
             ["default"] = actions.file_edit,

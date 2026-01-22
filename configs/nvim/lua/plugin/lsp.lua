@@ -11,21 +11,22 @@ require('blink.cmp').setup({
         ['<Tab>'] = { 'accept', 'fallback' },
         ['<C-j>'] = { 'select_next', 'fallback' },
         ['<C-k>'] = { 'select_prev', 'fallback' },
-        ['<C-l>'] = { 'show_signature', 'hide_signature', 'fallback' },
+        ['<C-l>'] = { 'show_documentation', 'hide_documentation', 'show_signature', 'hide_signature', 'fallback' },
     },
     -- Workaround to download rust binary
     fuzzy = {
         implementation = "prefer_rust_with_warning",
         prebuilt_binaries = { force_version = "v1.8.0" },
     },
-    signature = { enabled = true },
+    signature = {
+        enabled = true,
+        window = { border = "single" },
+    },
     completion = {
         accept = { auto_brackets = { enabled = true } },
         keyword = { range = 'full' },
-        documentation = {
-            auto_show = true,
-            auto_show_delay_ms = 200,
-        },
+        documentation = { auto_show = false, window = { border = "single" } },
+        menu = { draw = { columns = { { 'kind_icon', 'label', gap = 1 } } } },
     },
     sources = {
         default = { 'lsp', 'path', 'snippets', 'buffer' },
@@ -61,6 +62,7 @@ for _, server in ipairs(servers) do
                     analysis = {
                         typeCheckingMode = "off",
                         diagnosticMode = "openFilesOnly",
+                        autoImportCompletions = false,
                     },
                 },
             }
@@ -68,7 +70,10 @@ for _, server in ipairs(servers) do
         elseif server == 'ty' then
             config.settings = {
                 ty = {
-                    -- diagnosticMode = "off"
+                    completions = {
+                        autoImport = false,
+                    },
+                    -- diagnosticMode = "off",
                 }
             }
         end
