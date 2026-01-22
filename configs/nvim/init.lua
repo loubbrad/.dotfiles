@@ -65,11 +65,30 @@ end)
 -- Center after jump
 vim.keymap.set('n', '<C-u>', '<C-u>zz')
 vim.keymap.set('n', '<C-d>', '<C-d>zz')
+vim.keymap.set('n', 'n', 'nzz')
+vim.keymap.set('n', 'N', 'Nzz')
 
 -- Quick fix list
-vim.keymap.set('n', '<M-j>', '<cmd>cnext<CR>')
-vim.keymap.set('n', '<M-k>', '<cmd>cprev<CR>')
-vim.keymap.set('n', '<leader>q', '<cmd>cclose<CR>')
+vim.keymap.set('n', '<C-j>', '<cmd>cnext<CR>')
+vim.keymap.set('n', '<C-k>', '<cmd>cprev<CR>')
+vim.keymap.set('n', '<leader>q', function()
+  local qf_open = false
+  for _, win in ipairs(vim.api.nvim_list_wins()) do
+    local info = vim.fn.getwininfo(win)[1]
+    if info.quickfix == 1 and info.loclist == 0 then
+      qf_open = true
+      break
+    end
+  end
+  if qf_open then
+    vim.cmd('cclose')
+  else
+    vim.cmd('copen')
+  end
+end)
+vim.keymap.set('n', '<leader>dq', function()
+  vim.diagnostic.setqflist({ open = true, bufnr = 0 })
+end)
 
 -- Swap search word-direction keys
 vim.keymap.set('n', '*', '#')
@@ -141,7 +160,7 @@ end)
 local path_package = vim.fn.stdpath('data') .. '/site/'
 local mini_path = path_package .. 'pack/deps/start/mini.nvim'
 
-if not vim.loop.fs_stat(mini_path) then
+if not vim.uv.fs_stat(mini_path) then
   vim.cmd('echo "Installing `mini.nvim`" | redraw')
   vim.fn.system({
     'git', 'clone', '--filter=blob:none',

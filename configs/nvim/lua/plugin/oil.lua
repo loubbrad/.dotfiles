@@ -41,36 +41,27 @@ require("oil").setup({
 vim.keymap.set("n", "-", "<CMD>Oil<CR>")
 
 vim.keymap.set("n", "<leader>o", function()
-    if vim.api.nvim_buf_get_option(0, "filetype") ~= "oil" then
-        vim.g.oil_prev_win = vim.api.nvim_get_current_win()
-    end
-
-    local oil_win = nil
+    local oil_wins = {}
     for _, win in ipairs(vim.api.nvim_list_wins()) do
         local buf = vim.api.nvim_win_get_buf(win)
         if vim.bo[buf].filetype == 'oil' then
-            oil_win = win
-            break
+            table.insert(oil_wins, win)
         end
     end
 
-    if oil_win then
-        vim.api.nvim_set_current_win(oil_win)
-    else
-        vim.cmd("topleft 30vnew | Oil")
-    end
-end)
-
-vim.keymap.set('n', '<leader>q', function()
-    vim.cmd('cclose')
-    local current_win = vim.api.nvim_get_current_win()
-    for _, win in ipairs(vim.api.nvim_list_wins()) do
-        local buf = vim.api.nvim_win_get_buf(win)
-        if vim.bo[buf].filetype == 'oil' then
+    if #oil_wins > 0 then
+        local current_win = vim.api.nvim_get_current_win()
+        for _, win in ipairs(oil_wins) do
             if win == current_win then
-                vim.cmd("wincmd p") 
+                vim.cmd("wincmd p")
+                break
             end
+        end
+        for _, win in ipairs(oil_wins) do
             vim.api.nvim_win_close(win, true)
         end
+    else
+        vim.g.oil_prev_win = vim.api.nvim_get_current_win()
+        vim.cmd("topleft 30vnew | Oil")
     end
 end)
