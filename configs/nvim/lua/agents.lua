@@ -35,6 +35,6 @@ function M.send_to_claude()
   vim.fn.system(string.format("tmux select-window -t %s && tmux select-pane -t %s", target, target))
 end
 
-vim.keymap.set("x", "<leader>cc", M.send_to_claude)
+vim.keymap.set("x", "<leader>cc", ":<C-u>lua require('agents').send_to_claude()<CR>")
 
 return M
