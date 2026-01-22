@@ -187,4 +187,5 @@ require('plugin.oil')
 require('plugin.format')
 require('plugin.lsp')
 require('plugin.fzf')
+require('agents')
 
