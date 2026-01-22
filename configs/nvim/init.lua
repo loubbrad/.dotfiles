@@ -159,12 +159,6 @@ vim.keymap.set('n', '<leader>#', function()
   _G.smart_split_action(function() vim.cmd('normal! *') end)
 end)
 
-vim.keymap.set('n', '<leader>/', function()
-  _G.smart_split_action(function()
-    vim.api.nvim_feedkeys('/', 'n', false)
-  end)
-end)
-
 -- Plugins
 local path_package = vim.fn.stdpath('data') .. '/site/'
 local mini_path = path_package .. 'pack/deps/start/mini.nvim'
