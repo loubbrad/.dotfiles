@@ -35,6 +35,12 @@ require("oil").setup({
     view_options = { show_hidden = true },
     keymaps = {
         ["<CR>"] = { callback = smart_enter, desc = "Smart Open" },
+        ["<leader>r"] = {
+            callback = function()
+                require("oil").open(vim.fn.getcwd())
+            end,
+            desc = "Go to root (cwd)"
+        },
     }
 })
 
@@ -62,6 +68,12 @@ vim.keymap.set("n", "<leader>o", function()
         end
     else
         vim.g.oil_prev_win = vim.api.nvim_get_current_win()
-        vim.cmd("topleft 30vnew | Oil")
+        local current_file = vim.api.nvim_buf_get_name(0)
+        local dir = vim.fn.getcwd()  -- fallback to cwd
+        if current_file ~= "" then
+            dir = vim.fn.fnamemodify(current_file, ":h")
+        end
+        vim.cmd("topleft 30vnew")
+        require("oil").open(dir)
     end
 end)
