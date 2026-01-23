@@ -20,7 +20,7 @@ require('blink.cmp').setup({
     },
     signature = {
         enabled = true,
-        window = { border = "single" },
+        window = { border = "single", show_documentation = true },
     },
     completion = {
         accept = { auto_brackets = { enabled = true } },

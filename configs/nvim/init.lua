@@ -147,8 +147,9 @@ function _G.smart_split_action(callback)
   callback()
 end
 
+-- Recursive for lsp keymap
 vim.keymap.set('n', '<leader>gd', function()
-  _G.smart_split_action(function() vim.cmd('normal! gd') end)
+  _G.smart_split_action(function() vim.cmd('normal gd') end)  
 end)
 
 vim.keymap.set('n', '<leader>gf', function()
