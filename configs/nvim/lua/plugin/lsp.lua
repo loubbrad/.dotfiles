@@ -48,37 +48,38 @@ vim.api.nvim_create_autocmd('LspAttach', {
 })
 
 local capabilities = require('blink.cmp').get_lsp_capabilities()
-local servers = { 'ty', 'basedpyright' }
 
-for _, server in ipairs(servers) do
-    if vim.fn.executable(server) == 1 then
-        local config = {
-            capabilities = capabilities,
+local servers = {
+    ty = {
+        cmd = { 'ty', 'server' },
+        filetypes = { 'python' },
+        settings = {
+            ty = {
+                completions = { autoImport = false },
+            }
         }
-
-        if server == 'basedpyright' then
-            config.settings = {
-                basedpyright = {
-                    analysis = {
-                        typeCheckingMode = "off",
-                        diagnosticMode = "openFilesOnly",
-                        autoImportCompletions = false,
-                    },
+    },
+    basedpyright = {
+        cmd = { 'basedpyright-langserver', '--stdio' },
+        filetypes = { 'python' },
+        settings = {
+            basedpyright = {
+                analysis = {
+                    typeCheckingMode = "off",
+                    diagnosticMode = "openFilesOnly",
+                    autoImportCompletions = false,
                 },
-            }
+            },
+        }
+    },
+    bashls = {
+        cmd = { 'bash-language-server', 'start' },
+        filetypes = { 'sh', 'bash', 'zsh' },
+    },
+}
 
-        elseif server == 'ty' then
-            config.settings = {
-                ty = {
-                    completions = {
-                        autoImport = false,
-                    },
-                    -- diagnosticMode = "off",
-                }
-            }
-        end
-
-        vim.lsp.config(server, config)
-        vim.lsp.enable(server)
-    end
+for server, config in pairs(servers) do
+    config.capabilities = capabilities
+    vim.lsp.config(server, config)
+    vim.lsp.enable(server)
 end
