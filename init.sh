@@ -121,6 +121,12 @@ link_configs() {
     mkdir -p "$HOME/.config/zsh"
     ln -sfn "$DOTFILES_DIR/configs/key-bindings.zsh" "$HOME/.config/zsh/key-bindings.zsh"
     echo " - Linked key-bindings.zsh"
+
+    # Create machine-specific local config if it doesn't exist
+    if [ ! -f "$HOME/.config/zsh/local.zsh" ]; then
+        touch "$HOME/.config/zsh/local.zsh"
+        echo " - Created local.zsh for machine-specific settings"
+    fi
 }
 
 install_ssh() {

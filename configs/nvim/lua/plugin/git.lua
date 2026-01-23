@@ -11,6 +11,10 @@ gitsigns.setup({
     }
 })
 
+vim.api.nvim_set_hl(0, "GitSignsAdd", { fg = "#6A9955" })    -- vscGreen
+vim.api.nvim_set_hl(0, "GitSignsChange", { fg = "#569CD6" }) -- vscBlue
+vim.api.nvim_set_hl(0, "GitSignsDelete", { fg = "#F44747" }) -- vscRed
+
 local function next_hunk()
     if vim.wo.diff then
         vim.cmd.normal({']c', bang = true})

@@ -64,25 +64,10 @@ zle -N zle-line-init
 echo -ne '\e[5 q' # Use beam shape cursor on startup.
 preexec() { echo -ne '\e[5 q' ;} # Use beam shape cursor for each new prompt.
 
-# Env specific shell settings
-if [[ -f "$HOME/.local/bin/env" ]]; then
-  . "$HOME/.local/bin/env"
+# Machine-specific shell settings
+if [[ -f "$HOME/.config/zsh/local.zsh" ]]; then
+  source "$HOME/.config/zsh/local.zsh"
 fi
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
-
-# >>> conda initialize >>>
-# !! Contents within this block are managed by 'conda init' !!
-__conda_setup="$('/home/loubb/miniconda3/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
-if [ $? -eq 0 ]; then
-    eval "$__conda_setup"
-else
-    if [ -f "/home/loubb/miniconda3/etc/profile.d/conda.sh" ]; then
-        . "/home/loubb/miniconda3/etc/profile.d/conda.sh"
-    else
-        export PATH="/home/loubb/miniconda3/bin:$PATH"
-    fi
-fi
-unset __conda_setup
-# <<< conda initialize <<<
 
