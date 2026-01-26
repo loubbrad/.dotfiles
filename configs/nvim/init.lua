@@ -4,6 +4,7 @@ vim.opt.wrap = false
 vim.opt.tabstop = 4
 vim.opt.shiftwidth = 4
 vim.opt.expandtab = true
+vim.opt.diffopt = "internal,filler,closeoff,vertical,algorithm:histogram,indent-heuristic,linematch:60"
 vim.g.mapleader = " "
 
 vim.opt.spell = true
