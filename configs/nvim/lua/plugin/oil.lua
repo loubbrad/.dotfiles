@@ -1,6 +1,6 @@
 MiniDeps.add('stevearc/oil.nvim')
 
-local function smart_enter()
+local function oil_select(use_smart_split)
     local oil = require("oil")
     local entry = oil.get_cursor_entry()
 
@@ -10,32 +10,39 @@ local function smart_enter()
     end
 
     local path = oil.get_current_dir() .. entry.name
-    local target_win = vim.g.oil_prev_win
+    local oil_win = vim.api.nvim_get_current_win()
+    local prev_win = vim.g.oil_prev_win
+    local has_prev = prev_win and vim.api.nvim_win_is_valid(prev_win)
+    vim.g.oil_prev_win = nil
 
-    if not target_win or not vim.api.nvim_win_is_valid(target_win) then
-        target_win = nil 
-        for _, win in ipairs(vim.api.nvim_list_wins()) do
-            if win ~= vim.api.nvim_get_current_win() then
-                target_win = win
-                break
-            end
-        end
+    if #vim.api.nvim_list_wins() == 1 then
+        vim.cmd("edit " .. vim.fn.fnameescape(path))
+        return
     end
 
-    if target_win then
-        vim.api.nvim_set_current_win(target_win)
-        vim.g.oil_prev_win = nil 
+    if has_prev then
+        vim.api.nvim_set_current_win(prev_win)
+    else
+        vim.cmd("wincmd p")
     end
+    vim.api.nvim_win_close(oil_win, true)
 
-    vim.cmd("edit " .. vim.fn.fnameescape(path))
+    if use_smart_split then
+        _G.smart_split_action(function()
+            vim.cmd("edit " .. vim.fn.fnameescape(path))
+        end)
+    else
+        vim.cmd("edit " .. vim.fn.fnameescape(path))
+    end
 end
 
 require("oil").setup({
     default_file_explorer = true,
     view_options = { show_hidden = true },
     keymaps = {
-        ["<CR>"] = { callback = smart_enter, desc = "Smart Open" },
-        ["<leader>r"] = {
+        ["<CR>"] = { callback = function() oil_select(false) end, desc = "Open file" },
+        ["<C-s>"] = { callback = function() oil_select(true) end, desc = "Open in split" },
+        ["<C-r>"] = {
             callback = function()
                 require("oil").open(vim.fn.getcwd())
             end,

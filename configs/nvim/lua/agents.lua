@@ -25,7 +25,7 @@ function M.send_to_claude()
   end
 
   local target = panes[1]
-  local file = vim.fn.expand("%:.")
+  local file = vim.fn.expand("%:p")
   local start_line = vim.fn.line("'<")
   local end_line = vim.fn.line("'>")
 

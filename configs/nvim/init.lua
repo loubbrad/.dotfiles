@@ -121,18 +121,19 @@ vim.g.clipboard = {
 }
 
 -- Open new window commands
-function _G.smart_split_action(callback)
+function _G.smart_split_action(callback, target_win)
+  local explicit = target_win ~= nil
   local curr_win = vim.api.nvim_get_current_win()
   local curr_buf = vim.api.nvim_get_current_buf()
   local curr_pos = vim.api.nvim_win_get_cursor(0)
 
-  local target_win = nil
-
-  for _, win in ipairs(vim.api.nvim_list_wins()) do
-    local buf = vim.api.nvim_win_get_buf(win)
-    if win ~= curr_win and vim.bo[buf].filetype ~= 'oil' then
-      target_win = win
-      break
+  if not target_win then
+    for _, win in ipairs(vim.api.nvim_list_wins()) do
+      local buf = vim.api.nvim_win_get_buf(win)
+      if win ~= curr_win and vim.bo[buf].filetype ~= 'oil' then
+        target_win = win
+        break
+      end
     end
   end
 
@@ -142,8 +143,10 @@ function _G.smart_split_action(callback)
     vim.cmd('vsplit')
   end
 
-  vim.api.nvim_set_current_buf(curr_buf)
-  vim.api.nvim_win_set_cursor(0, curr_pos)
+  if not explicit then
+    vim.api.nvim_set_current_buf(curr_buf)
+    vim.api.nvim_win_set_cursor(0, curr_pos)
+  end
 
   callback()
 end
