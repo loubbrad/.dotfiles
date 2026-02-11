@@ -42,6 +42,18 @@ require("oil").setup({
     keymaps = {
         ["<CR>"] = { callback = function() oil_select(false) end, desc = "Open file" },
         ["<C-s>"] = { callback = function() oil_select(true) end, desc = "Open in split" },
+        ["<C-y>"] = {
+            callback = function()
+                local oil = require("oil")
+                local entry = oil.get_cursor_entry()
+                if entry then
+                    local path = oil.get_current_dir() .. entry.name
+                    vim.fn.setreg("+", path)
+                    vim.notify(path)
+                end
+            end,
+            desc = "Yank file path"
+        },
         ["<C-r>"] = {
             callback = function()
                 require("oil").open(vim.fn.getcwd())
