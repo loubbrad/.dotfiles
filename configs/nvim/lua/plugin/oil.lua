@@ -78,10 +78,16 @@ vim.keymap.set("n", "<leader>o", function()
         local current_win = vim.api.nvim_get_current_win()
         for _, win in ipairs(oil_wins) do
             if win == current_win then
-                vim.cmd("wincmd p")
+                local prev = vim.g.oil_prev_win
+                if prev and vim.api.nvim_win_is_valid(prev) then
+                    vim.api.nvim_set_current_win(prev)
+                else
+                    vim.cmd("wincmd p")
+                end
                 break
             end
         end
+        vim.g.oil_prev_win = nil
         for _, win in ipairs(oil_wins) do
             vim.api.nvim_win_close(win, true)
         end
