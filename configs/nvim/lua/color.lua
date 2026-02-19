@@ -18,11 +18,11 @@ function M.setup()
     }
 
     local highlights = {
-        ["Normal"]             = { fg = c.vscFront, bg = c.vscBack },
-        ["NormalNC"]           = { fg = c.vscFront, bg = c.vscBack },
-        ["SignColumn"]         = { bg = c.vscBack },
-        ["LineNr"]             = { fg = c.vscGray, bg = c.vscBack },
-        ["WinSeparator"]       = { fg = '#444444', bg = c.vscBack },
+        ["Normal"]             = { fg = c.vscFront, bg = 'NONE' },
+        ["NormalNC"]           = { fg = c.vscFront, bg = 'NONE' },
+        ["SignColumn"]         = { bg = 'NONE' },
+        ["LineNr"]             = { fg = c.vscGray, bg = 'NONE' },
+        ["WinSeparator"]       = { fg = '#444444', bg = 'NONE' },
         ["DiagnosticError"]    = { fg = c.vscRed },
         ["DiagnosticWarn"]     = { fg = c.vscYellow },
         ["DiagnosticInfo"]     = { fg = c.vscBlue },
