@@ -6,6 +6,7 @@ vim.opt.shiftwidth = 4
 vim.opt.expandtab = true
 vim.opt.inccommand = "nosplit"
 vim.opt.diffopt = "internal,filler,closeoff,vertical,algorithm:histogram,indent-heuristic,linematch:60"
+vim.opt.autoread = true
 vim.g.mapleader = " "
 
 vim.opt.spell = true
@@ -189,3 +190,18 @@ require('plugin.lsp')
 require('plugin.fzf')
 require('agents')
 
+vim.api.nvim_create_user_command('BufGrep', function(opts)
+  local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
+  local results = vim.fn.systemlist('grep ' .. opts.args, lines)
+
+  if #results == 0 then
+    vim.notify('No matches', vim.log.levels.INFO)
+    return
+  end
+
+  local buf = vim.api.nvim_create_buf(false, true)
+  vim.api.nvim_buf_set_lines(buf, 0, -1, false, results)
+  vim.api.nvim_buf_set_option(buf, 'modifiable', false)
+  vim.api.nvim_buf_set_option(buf, 'buftype', 'nofile')
+  vim.api.nvim_set_current_buf(buf)
+end, { nargs = '+' })

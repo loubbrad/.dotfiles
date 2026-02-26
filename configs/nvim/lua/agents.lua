@@ -6,7 +6,7 @@ function M.send_to_claude()
     return
   end
 
-  local handle = io.popen("tmux list-panes -s -F '#{pane_id} #{pane_current_command}' | grep -w claude")
+  local handle = io.popen("tmux list-panes -s -F '#{pane_id} #{pane_current_command} #{window_name}' | grep -E -w 'claude|codex'")
   local result = handle:read("*a")
   handle:close()
 
@@ -16,11 +16,11 @@ function M.send_to_claude()
   end
 
   if #panes == 0 then
-    vim.notify("No claude instance found", vim.log.levels.ERROR)
+    vim.notify("No claude or codex instance found", vim.log.levels.ERROR)
     return
   end
   if #panes > 1 then
-    vim.notify("Multiple claude instances found", vim.log.levels.ERROR)
+    vim.notify("Multiple claude/codex instances found", vim.log.levels.ERROR)
     return
   end
 
