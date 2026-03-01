@@ -10,7 +10,7 @@ local function copy_abs_path(selected)
 end
 
 local function smart_split(selected, opts)
-    _G.smart_split_action(function()
+    require('commands').smart_split_action(function()
         actions.file_edit(selected, opts)
     end)
 end

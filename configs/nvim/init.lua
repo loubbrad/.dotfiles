@@ -13,12 +13,13 @@ vim.opt.spell = true
 vim.opt.spelllang = "en_us"
 vim.opt.spelloptions = "camel"
 
-require('color').setup()
 vim.opt.colorcolumn = "80"
 vim.api.nvim_set_hl(0, "ColorColumn", { bg = "#2a2a2a" }) 
-vim.api.nvim_set_hl(0, "StatusLine", { link = "Normal" })
-vim.api.nvim_set_hl(0, "StatusLineNC", { link = "Normal" })
 vim.api.nvim_set_hl(0, "WinSeparator", { fg = "#444444" })
+
+require('color').setup()
+require('statusline').setup()
+require('commands').setup()
 
 -- Cache history
 local undo_dir = vim.fn.stdpath('cache') .. '/undo'
@@ -64,6 +65,9 @@ vim.keymap.set({'n', 'v'}, '<leader>d', '"_d')
 vim.keymap.set("n", "<leader>fp", function()
   vim.fn.setreg("+", vim.fn.expand("%:p"))
 end)
+
+vim.keymap.set("n", "<leader>md", ":delmarks ")
+vim.keymap.set("n", "<leader>mD", "<cmd>delmarks A-Z<cr>")
 
 -- Center after jump
 vim.keymap.set('n', '<C-u>', '<C-u>zz')
@@ -122,48 +126,17 @@ vim.g.clipboard = {
   },
 }
 
--- Open new window commands
-function _G.smart_split_action(callback, target_win)
-  local explicit = target_win ~= nil
-  local curr_win = vim.api.nvim_get_current_win()
-  local curr_buf = vim.api.nvim_get_current_buf()
-  local curr_pos = vim.api.nvim_win_get_cursor(0)
-
-  if not target_win then
-    for _, win in ipairs(vim.api.nvim_list_wins()) do
-      local buf = vim.api.nvim_win_get_buf(win)
-      if win ~= curr_win and vim.bo[buf].filetype ~= 'oil' then
-        target_win = win
-        break
-      end
-    end
-  end
-
-  if target_win then
-    vim.api.nvim_set_current_win(target_win)
-  else
-    vim.cmd('vsplit')
-  end
-
-  if not explicit then
-    vim.api.nvim_set_current_buf(curr_buf)
-    vim.api.nvim_win_set_cursor(0, curr_pos)
-  end
-
-  callback()
-end
-
 -- Recursive for lsp keymap
 vim.keymap.set('n', '<leader>gd', function()
-  _G.smart_split_action(function() vim.cmd('normal gd') end)  
+  require('commands').smart_split_action(function() vim.cmd('normal gd') end)
 end)
 
 vim.keymap.set('n', '<leader>gf', function()
-  _G.smart_split_action(function() vim.cmd('normal! gf') end)
+  require('commands').smart_split_action(function() vim.cmd('normal! gf') end)
 end)
 
 vim.keymap.set('n', '<leader>#', function()
-  _G.smart_split_action(function() vim.cmd('normal! *') end)
+  require('commands').smart_split_action(function() vim.cmd('normal! *') end)
 end)
 
 -- Plugins
@@ -188,20 +161,3 @@ require('plugin.oil')
 require('plugin.format')
 require('plugin.lsp')
 require('plugin.fzf')
-require('agents')
-
-vim.api.nvim_create_user_command('BufGrep', function(opts)
-  local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
-  local results = vim.fn.systemlist('grep ' .. opts.args, lines)
-
-  if #results == 0 then
-    vim.notify('No matches', vim.log.levels.INFO)
-    return
-  end
-
-  local buf = vim.api.nvim_create_buf(false, true)
-  vim.api.nvim_buf_set_lines(buf, 0, -1, false, results)
-  vim.api.nvim_buf_set_option(buf, 'modifiable', false)
-  vim.api.nvim_buf_set_option(buf, 'buftype', 'nofile')
-  vim.api.nvim_set_current_buf(buf)
-end, { nargs = '+' })

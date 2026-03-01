@@ -28,7 +28,7 @@ local function oil_select(use_smart_split)
     vim.api.nvim_win_close(oil_win, true)
 
     if use_smart_split then
-        _G.smart_split_action(function()
+        require('commands').smart_split_action(function()
             vim.cmd("edit " .. vim.fn.fnameescape(path))
         end)
     else
