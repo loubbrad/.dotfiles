@@ -133,17 +133,17 @@ local function marks_label()
 end
 
 function M.render()
-  local left = marks_label()
+  local marks = marks_label()
 
   return table.concat({
-    left,
-    "%=",
     "%<",
+    "%f",
+    "%=",
     "%(%l,%c%V%)",
     " ",
-    "%f",
-    " ",
     "%h%w%m%r",
+    " ",
+    marks,
   })
 end
 
