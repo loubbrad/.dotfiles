@@ -40,6 +40,8 @@ vim.keymap.set('n', '<C-_>', 'gcc', { remap = true })
 vim.keymap.set('x', '<C-/>', 'gc', { remap = true })
 vim.keymap.set('x', '<C-_>', 'gc', { remap = true }) 
 
+vim.keymap.set('n', '<leader>gq', 'vipgq', { remap = true }) 
+
 -- Window qol
 vim.opt.fillchars = { vert = "|" }
 vim.opt.splitright = true

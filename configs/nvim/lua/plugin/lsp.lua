@@ -59,19 +59,6 @@ local servers = {
             }
         }
     },
-    basedpyright = {
-        cmd = { 'basedpyright-langserver', '--stdio' },
-        filetypes = { 'python' },
-        settings = {
-            basedpyright = {
-                analysis = {
-                    typeCheckingMode = "off",
-                    diagnosticMode = "openFilesOnly",
-                    autoImportCompletions = false,
-                },
-            },
-        }
-    },
     bashls = {
         cmd = { 'bash-language-server', 'start' },
         filetypes = { 'sh', 'bash', 'zsh' },

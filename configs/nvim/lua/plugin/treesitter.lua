@@ -3,6 +3,10 @@ MiniDeps.add({
   checkout = 'main',
   hooks = { post_checkout = function() vim.cmd('TSUpdate') end },
 })
+MiniDeps.add({
+  source = 'nvim-treesitter/nvim-treesitter-textobjects',
+  depends = { 'nvim-treesitter/nvim-treesitter' },
+})
 local ts = require('nvim-treesitter')
 ts.install({ "python", "lua", "bash" }, { summary = false })
 
@@ -11,4 +15,23 @@ vim.api.nvim_create_autocmd('FileType', {
     pcall(vim.treesitter.start, args.buf, args.match)
   end,
 })
+
+require('nvim-treesitter-textobjects').setup({
+  select = { lookahead = true },
+})
+
+local select_obj = require('nvim-treesitter-textobjects.select')
+local textobjects = {
+  ["af"] = "@function.outer",
+  ["if"] = "@function.inner",
+  ["ac"] = "@class.outer",
+  ["ic"] = "@class.inner",
+  ["aa"] = "@parameter.outer",
+  ["ia"] = "@parameter.inner",
+}
+for key, query in pairs(textobjects) do
+  vim.keymap.set({"x", "o"}, key, function()
+    select_obj.select_textobject(query, "textobjects")
+  end)
+end
 
