@@ -3,6 +3,7 @@ set -e
 
 SYSTEM_GLIBC=$(ldd --version | head -n1 | grep -oE '[0-9]+\.[0-9]+' | head -n1)
 DOTFILES_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &> /dev/null && pwd)
+export PATH="$HOME/.local/bin:$HOME/.fzf/bin:$PATH"
 INSTALL_CONDA=false
 INSTALL_SSH=false
 SHELL_RESTART_REQUIRED=false
@@ -67,7 +68,7 @@ install_binaries() {
         TREE_SITTER_URL="https://github.com/tree-sitter/tree-sitter/releases/download/v0.25.10/tree-sitter-linux-x64.gz"
     fi
 
-    if ! command -v nvim >/dev/null 2>&1; then
+    if ! command -v nvim >/dev/null 2>&1 && [ ! -x "$HOME/.local/bin/nvim" ]; then
         echo "> Installing Neovim..."
         mkdir -p "$HOME/nvim"
         curl -L "$NVIM_URL" -o nvim.tar.gz
@@ -76,9 +77,9 @@ install_binaries() {
         ln -sf "$HOME/nvim/bin/nvim" "$HOME/.local/bin/nvim"
     fi
 
-    if ! command -v fzf >/dev/null 2>&1; then
+    if ! command -v fzf >/dev/null 2>&1 && [ ! -x "$HOME/.fzf/bin/fzf" ]; then
         echo "> Installing FZF..."
-        git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
+        [ -d "$HOME/.fzf/.git" ] || git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
         ~/.fzf/install --all --no-update-rc 
     fi
 
@@ -190,9 +191,10 @@ main() {
     fi
 
     # Change default shell if not already zsh
-    if [ "$NO_ROOT" = false ] && [[ "$SHELL" != */zsh ]]; then
+    CURRENT_LOGIN_SHELL="$(getent passwd "$USER" | cut -d: -f7)"
+    if [ "$NO_ROOT" = false ] && [ "$CURRENT_LOGIN_SHELL" != "$(command -v zsh)" ]; then
         echo "> Changing shell to zsh..."
-        sudo chsh -s "$(which zsh)" "$USER"
+        sudo chsh -s "$(command -v zsh)" "$USER"
         SHELL_RESTART_REQUIRED=true
     fi
 
