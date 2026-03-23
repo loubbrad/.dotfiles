@@ -1,0 +1,22 @@
+Bootstrap: docker
+From: nvidia/cuda:12.5.0-devel-ubuntu22.04
+
+%help
+  CUDA dev environment base image.
+
+%post
+  export DEBIAN_FRONTEND=noninteractive
+  apt-get update && apt-get install -y \
+    zsh tmux git curl wget gnupg fd-find silversearcher-ag ripgrep \
+    sudo ffmpeg nvtop locales
+
+  locale-gen en_US.UTF-8
+  apt-get clean && rm -rf /var/lib/apt/lists/*
+
+%environment
+  export LANG=en_US.UTF-8
+  export LC_ALL=en_US.UTF-8
+  export SHELL=/usr/bin/zsh
+
+%runscript
+  exec /usr/bin/zsh "${@}"
