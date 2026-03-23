@@ -4,14 +4,14 @@ set -e
 SYSTEM_GLIBC=$(ldd --version | head -n1 | grep -oE '[0-9]+\.[0-9]+' | head -n1)
 DOTFILES_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &> /dev/null && pwd)
 export PATH="$HOME/.local/bin:$HOME/.fzf/bin:$PATH"
-INSTALL_CONDA=false
+INSTALL_UV=false
 INSTALL_SSH=false
 SHELL_RESTART_REQUIRED=false
 NO_ROOT=false
 
 for arg in "$@"; do
   case $arg in
-    --conda) INSTALL_CONDA=true
+    --uv) INSTALL_UV=true
       shift
       ;;
     --ssh)
@@ -94,12 +94,10 @@ install_binaries() {
     echo "> Binary installation complete."
 }
 
-install_miniconda() {
-    if [ ! -d "$HOME/miniconda3" ] && ! command -v conda >/dev/null 2>&1; then
-        echo "> Installing Miniconda..."
-        wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
-        bash miniconda.sh -b -p "$HOME/miniconda3"
-        rm miniconda.sh
+install_uv() {
+    if ! command -v uv >/dev/null 2>&1 && [ ! -x "$HOME/.local/bin/uv" ]; then
+        echo "> Installing uv..."
+        curl -LsSf https://astral.sh/uv/install.sh | sh
     fi
 }
 
@@ -179,11 +177,8 @@ main() {
     install_binaries
     link_configs
 
-    if [ "$INSTALL_CONDA" = true ]; then
-        install_miniconda
-        "$HOME/miniconda3/bin/conda" init zsh
-        "$HOME/miniconda3/bin/conda" init bash
-        SHELL_RESTART_REQUIRED=true
+    if [ "$INSTALL_UV" = true ]; then
+        install_uv
     fi
 
     if [ "$INSTALL_SSH" = true ]; then
@@ -202,7 +197,7 @@ main() {
         echo ""
         echo "#####################################################################"
         echo "IMPORTANT: A shell restart or new login session is required for all"
-        echo "           changes (like zsh or conda) to take effect."
+        echo "           changes (like zsh) to take effect."
         echo "#####################################################################"
     fi
 }

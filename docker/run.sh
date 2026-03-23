@@ -19,10 +19,6 @@ if [ "$mount_volumes" = true ]; then
         docker_args+=(-v "$HOME/work:/home/$(whoami)/work")
     fi
 
-    if [ -d "$HOME/miniconda3" ]; then
-        docker_args+=(-v "$HOME/miniconda3:/home/$(whoami)/miniconda3")
-    fi
 fi
 
 docker run "${docker_args[@]}" dev
-
