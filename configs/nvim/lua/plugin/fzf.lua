@@ -1,4 +1,7 @@
-MiniDeps.add('ibhagwan/fzf-lua')
+vim.pack.add({
+    'https://github.com/ibhagwan/fzf-lua',
+}, { confirm = false })
+
 local fzf = require('fzf-lua')
 local actions = require('fzf-lua.actions')
 

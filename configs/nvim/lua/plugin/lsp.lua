@@ -1,8 +1,8 @@
-MiniDeps.add({ source = 'neovim/nvim-lspconfig' })
-MiniDeps.add({
-  source = 'saghen/blink.cmp',
-  depends = { 'rafamadriz/friendly-snippets' },
-})
+vim.pack.add({
+  'https://github.com/neovim/nvim-lspconfig',
+  'https://github.com/rafamadriz/friendly-snippets',
+  'https://github.com/saghen/blink.cmp',
+}, { confirm = false })
 
 require('blink.cmp').setup({
     keymap = {

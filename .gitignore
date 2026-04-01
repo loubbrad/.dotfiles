@@ -1,1 +1,2 @@
 apptainer/devenv.simg
+configs/nvim/nvim-pack-lock.json

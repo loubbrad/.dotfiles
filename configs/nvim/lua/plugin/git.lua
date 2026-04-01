@@ -1,4 +1,7 @@
-MiniDeps.add('lewis6991/gitsigns.nvim')
+vim.pack.add({
+    'https://github.com/lewis6991/gitsigns.nvim',
+}, { confirm = false })
+
 local gitsigns = require('gitsigns')
 
 gitsigns.setup({
@@ -41,4 +44,3 @@ end, { desc = 'Diff This' })
 vim.keymap.set('n', '<leader>hq', function()
   gitsigns.setqflist(0, { open = true })
 end)
-

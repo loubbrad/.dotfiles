@@ -1,12 +1,8 @@
-MiniDeps.add({
-  source = 'nvim-treesitter/nvim-treesitter',
-  checkout = 'main',
-  hooks = { post_checkout = function() vim.cmd('TSUpdate') end },
-})
-MiniDeps.add({
-  source = 'nvim-treesitter/nvim-treesitter-textobjects',
-  depends = { 'nvim-treesitter/nvim-treesitter' },
-})
+vim.pack.add({
+  { src = 'https://github.com/nvim-treesitter/nvim-treesitter', version = 'main' },
+  'https://github.com/nvim-treesitter/nvim-treesitter-textobjects',
+}, { confirm = false })
+
 local ts = require('nvim-treesitter')
 ts.install({ "python", "lua", "bash" }, { summary = false })
 
@@ -34,4 +30,3 @@ for key, query in pairs(textobjects) do
     select_obj.select_textobject(query, "textobjects")
   end)
 end
-

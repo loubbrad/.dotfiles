@@ -142,21 +142,30 @@ vim.keymap.set('n', '<leader>#', function()
 end)
 
 -- Plugins
-local path_package = vim.fn.stdpath('data') .. '/site/'
-local mini_path = path_package .. 'pack/deps/start/mini.nvim'
+vim.api.nvim_create_autocmd('PackChanged', {
+  callback = function(ev)
+    local name, kind = ev.data.spec.name, ev.data.kind
+    if name ~= 'nvim-treesitter' then
+      return
+    end
 
-if not vim.uv.fs_stat(mini_path) then
-  vim.cmd('echo "Installing `mini.nvim`" | redraw')
-  vim.fn.system({
-    'git', 'clone', '--filter=blob:none',
-    'https://github.com/echasnovski/mini.nvim', mini_path
-  })
-  vim.cmd('packadd mini.nvim | helptags ALL')
-end
+    if kind ~= 'install' and kind ~= 'update' then
+      return
+    end
 
-vim.cmd('packadd mini.nvim')
+    if not ev.data.active then
+      vim.cmd.packadd(name)
+    end
 
-require('mini.deps').setup({ path = { package = path_package } })
+    vim.schedule(function()
+      local ok, err = pcall(vim.cmd, 'TSUpdate')
+      if not ok then
+        vim.notify('nvim-treesitter changed, but TSUpdate failed: ' .. err, vim.log.levels.WARN)
+      end
+    end)
+  end,
+})
+
 require('plugin.git')
 require('plugin.treesitter')
 require('plugin.oil')

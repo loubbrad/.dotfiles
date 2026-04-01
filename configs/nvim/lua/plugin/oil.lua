@@ -1,4 +1,6 @@
-MiniDeps.add('stevearc/oil.nvim')
+vim.pack.add({
+    'https://github.com/stevearc/oil.nvim',
+}, { confirm = false })
 
 local function oil_select(use_smart_split)
     local oil = require("oil")
