@@ -41,7 +41,10 @@ bindkey "^?" backward-delete-char
 bindkey '^k' up-line-or-history
 bindkey '^j' down-line-or-history
 export KEYTIMEOUT=1
-autoload edit-command-line; zle -N edit-command-line
+autoload edit-command-line
+zle -N edit-command-line
+bindkey -M viins '^E' edit-command-line
+bindkey -M vicmd '^E' edit-command-line
 
 # Change cursor shape for different vi modes.
 function zle-keymap-select {
@@ -70,4 +73,3 @@ if [[ -f "$HOME/.config/zsh/local.zsh" ]]; then
 fi
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
-
