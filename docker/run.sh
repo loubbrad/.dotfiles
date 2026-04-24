@@ -16,7 +16,7 @@ done
 
 if [ "$mount_volumes" = true ]; then
     if [ -d "$HOME/work" ]; then
-        docker_args+=(-v "$HOME/work:/home/$(whoami)/work")
+        docker_args+=(-v "$HOME/work:/home/ubuntu/work")
     fi
 
 fi
