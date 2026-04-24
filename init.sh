@@ -56,20 +56,27 @@ glibc_at_least() {
 }
 
 install_binaries() {
-    if glibc_at_least 2.33; then
-        NVIM_URL="https://github.com/neovim/neovim/releases/latest/download/nvim-linux-x86_64.tar.gz"
-    else
-        echo "> GLIBC $SYSTEM_GLIBC too old for latest neovim, using fallback"
-        NVIM_URL="https://github.com/neovim/neovim-releases/releases/download/v0.11.5/nvim-linux-x86_64.tar.gz"
-    fi
-
-    TREE_SITTER_URL=""
     if glibc_at_least 2.34; then
-        TREE_SITTER_URL="https://github.com/tree-sitter/tree-sitter/releases/download/v0.25.10/tree-sitter-linux-x64.gz"
+        NVIM_URL="https://github.com/neovim/neovim/releases/latest/download/nvim-linux-x86_64.tar.gz"
+    elif glibc_at_least 2.17; then
+        echo "> GLIBC $SYSTEM_GLIBC too old for latest neovim, using fallback"
+        NVIM_URL="https://github.com/neovim/neovim-releases/releases/latest/download/nvim-linux-x86_64.tar.gz"
+    else
+        NVIM_URL=""
+        echo "> GLIBC $SYSTEM_GLIBC too old for neovim binary install, skipping"
     fi
 
-    if ! command -v nvim >/dev/null 2>&1 && [ ! -x "$HOME/.local/bin/nvim" ]; then
-        echo "> Installing Neovim..."
+    if glibc_at_least 2.39; then
+        TREE_SITTER_URL="https://github.com/tree-sitter/tree-sitter/releases/latest/download/tree-sitter-linux-x64.gz"
+    elif glibc_at_least 2.34; then 
+        TREE_SITTER_URL="https://github.com/tree-sitter/tree-sitter/releases/download/v0.25.10/tree-sitter-linux-x64.gz"
+    else
+        TREE_SITTER_URL=""
+        echo "> GLIBC $SYSTEM_GLIBC too old for tree-sitter binary install, skipping"
+    fi
+
+    if [ -n "$NVIM_URL" ] && ! command -v nvim >/dev/null 2>&1 && [ ! -x "$HOME/.local/bin/nvim" ]; then
+        echo "> Installing Neovim from $NVIM_URL..."
         mkdir -p "$HOME/nvim"
         curl -L "$NVIM_URL" -o nvim.tar.gz
         tar -C "$HOME/nvim" -xzf nvim.tar.gz --strip-components=1
@@ -84,7 +91,7 @@ install_binaries() {
     fi
 
     if [ -n "$TREE_SITTER_URL" ] && ! command -v tree-sitter >/dev/null 2>&1; then
-        echo "> Installing Tree-sitter..."
+        echo "> Installing Tree-sitter from $TREE_SITTER_URL..."
         curl -L "$TREE_SITTER_URL" -o tree-sitter.gz
         gzip -d tree-sitter.gz
         chmod +x tree-sitter
