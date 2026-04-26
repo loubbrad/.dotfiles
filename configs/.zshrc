@@ -72,4 +72,3 @@ if [[ -f "$HOME/.config/zsh/local.zsh" ]]; then
   source "$HOME/.config/zsh/local.zsh"
 fi
 
-[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
