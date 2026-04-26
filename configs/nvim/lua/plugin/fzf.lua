@@ -52,8 +52,10 @@ fzf.setup({
 })
 
 vim.keymap.set('n', '<leader>ff', fzf.files, { desc = 'Fzf Files' })
+vim.keymap.set('n', '<leader>fd', fzf.diagnostics_document, { desc = 'Fzf Diagnostics' })
 vim.keymap.set('n', '<leader>fg', fzf.grep, { desc = 'Fzf Grep' })
 vim.keymap.set('n', '<leader>fb', fzf.buffers, { desc = 'Fzf Buffers' })
+vim.keymap.set('n', '<leader>fq', fzf.quickfix, { desc = 'Fzf Quickfix' })
 vim.keymap.set('n', '<leader>fr', fzf.resume, { desc = 'Fzf Resume' })
 vim.keymap.set('n', '<leader>f#', fzf.grep_cword, { desc = 'Grep Word' })
 vim.keymap.set('n', '<leader>:',  fzf.command_history, { desc = 'Command History' })
