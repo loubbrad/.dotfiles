@@ -99,7 +99,57 @@ local function unique_labels(marks)
   return labels
 end
 
-local function marks_label()
+local function local_marks_label()
+  local marks = {}
+
+  for _, mark in ipairs(vim.fn.getmarklist(vim.api.nvim_get_current_buf())) do
+    local name = mark.mark:sub(2)
+    local line = mark.pos and mark.pos[2] or 0
+
+    if name:match("^%l$") and line > 0 then
+      table.insert(marks, {
+        name = name,
+        line = line,
+        col = mark.pos and mark.pos[3] or 0,
+      })
+    end
+  end
+
+  if #marks == 0 then
+    return ""
+  end
+
+  table.sort(marks, function(a, b)
+    return a.name < b.name
+  end)
+
+  local labels = {}
+  local seen = {}
+
+  for index, mark in ipairs(marks) do
+    local key = tostring(mark.line)
+
+    if seen[key] then
+      labels[index] = string.format("%d,%d", mark.line, mark.col or 0)
+      local previous = seen[key]
+      local previous_mark = marks[previous]
+      labels[previous] = string.format("%d,%d", previous_mark.line, previous_mark.col or 0)
+    else
+      labels[index] = tostring(mark.line)
+      seen[key] = index
+    end
+  end
+
+  local parts = {}
+  for index, mark in ipairs(marks) do
+    local sep = index < #marks and " " or ""
+    table.insert(parts, esc(mark.name) .. ":" .. esc(labels[index]) .. sep)
+  end
+
+  return table.concat(parts)
+end
+
+local function global_marks_label()
   local marks = {}
 
   for _, mark in ipairs(vim.fn.getmarklist()) do
@@ -133,7 +183,11 @@ local function marks_label()
 end
 
 function M.render()
-  local marks = marks_label()
+  local local_marks = local_marks_label()
+  local global_marks = global_marks_label()
+  local marks = table.concat(vim.tbl_filter(function(part)
+    return part ~= ""
+  end, { local_marks, global_marks }), " ")
 
   return table.concat({
     "%<",

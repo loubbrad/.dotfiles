@@ -69,7 +69,7 @@ vim.keymap.set("n", "<leader>fp", function()
 end)
 
 vim.keymap.set("n", "<leader>md", ":delmarks ")
-vim.keymap.set("n", "<leader>mD", "<cmd>delmarks A-Z<cr>")
+vim.keymap.set("n", "<leader>mD", "<cmd>delmarks a-zA-Z<cr>")
 
 -- Center after jump
 vim.keymap.set('n', '<C-u>', '<C-u>zz')
