@@ -5,6 +5,7 @@ function M.smart_split_action(callback, target_win)
   local curr_win = vim.api.nvim_get_current_win()
   local curr_buf = vim.api.nvim_get_current_buf()
   local curr_pos = vim.api.nvim_win_get_cursor(0)
+  local created_win
 
   if not target_win then
     for _, win in ipairs(vim.api.nvim_list_wins()) do
@@ -20,6 +21,7 @@ function M.smart_split_action(callback, target_win)
     vim.api.nvim_set_current_win(target_win)
   else
     vim.cmd("vsplit")
+    created_win = vim.api.nvim_get_current_win()
   end
 
   if not explicit then
@@ -27,7 +29,18 @@ function M.smart_split_action(callback, target_win)
     vim.api.nvim_win_set_cursor(0, curr_pos)
   end
 
-  callback()
+  local ok, err = pcall(callback)
+  if not ok then
+    if created_win and vim.api.nvim_win_is_valid(created_win) then
+      vim.api.nvim_win_close(created_win, true)
+    end
+
+    if vim.api.nvim_win_is_valid(curr_win) then
+      vim.api.nvim_set_current_win(curr_win)
+    end
+
+    error(err, 0)
+  end
 end
 
 function M.send_to_agent()
@@ -92,6 +105,14 @@ function M.setup()
   end)
 
   vim.api.nvim_create_user_command("BufGrep", M.buf_grep, { nargs = "+" })
+
+  vim.api.nvim_create_autocmd("TextYankPost", {
+    group = vim.api.nvim_create_augroup("HighlightYank", { clear = true }),
+    desc = "Briefly highlight yanked text",
+    callback = function()
+      vim.highlight.on_yank({ higroup = "IncSearch", timeout = 350 })
+    end,
+  })
 end
 
 return M
