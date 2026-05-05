@@ -110,7 +110,7 @@ function M.setup()
     group = vim.api.nvim_create_augroup("HighlightYank", { clear = true }),
     desc = "Briefly highlight yanked text",
     callback = function()
-      vim.highlight.on_yank({ higroup = "IncSearch", timeout = 350 })
+      vim.highlight.on_yank({ higroup = "IncSearch", timeout = 250 })
     end,
   })
 end
