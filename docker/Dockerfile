@@ -11,6 +11,19 @@ RUN groupmod -g "$GID" "$USERNAME" \
     && usermod -u "$UID" -g "$GID" "$USERNAME" \
     && chown -R "$UID:$GID" "/home/$USERNAME"
 
+# SSH server for detached, local-only container access.
+RUN apt-get update && apt-get install -y openssh-server \
+    && mkdir -p /run/sshd "/home/$USERNAME/.ssh" /etc/ssh/sshd_config.d \
+    && chmod 700 "/home/$USERNAME/.ssh" \
+    && chown -R "$UID:$GID" "/home/$USERNAME/.ssh" \
+    && printf '%s\n' \
+        'PasswordAuthentication no' \
+        'KbdInteractiveAuthentication no' \
+        'PermitRootLogin no' \
+        'PubkeyAuthentication yes' \
+        "AllowUsers $USERNAME" \
+        > /etc/ssh/sshd_config.d/dev-container.conf
+
 RUN echo "$USERNAME ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 
 USER $USERNAME
