@@ -3,7 +3,6 @@
 docker_args=(
     -it
     --gpus all
-    --user $(id -u):$(id -g)
 )
 
 mount_volumes=false

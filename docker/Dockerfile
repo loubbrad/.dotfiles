@@ -7,6 +7,10 @@ ARG USERNAME=ubuntu
 ARG UID=1000
 ARG GID=1000
 
+RUN groupmod -g "$GID" "$USERNAME" \
+    && usermod -u "$UID" -g "$GID" "$USERNAME" \
+    && chown -R "$UID:$GID" "/home/$USERNAME"
+
 RUN echo "$USERNAME ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 
 USER $USERNAME
