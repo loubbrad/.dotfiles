@@ -146,11 +146,9 @@ install_ssh() {
 
     local temp_ssh_dir
     temp_ssh_dir=$(mktemp -d)
-    local temp_ssh_archive
-    temp_ssh_archive=$(mktemp)
 
     echo " - Decrypting archive..."
-    if gpg --decrypt "$encrypted_archive" > "$temp_ssh_archive" && tar -xzf "$temp_ssh_archive" -C "$temp_ssh_dir"; then
+    if gpg --decrypt "$encrypted_archive" 2>/dev/null | tar -xz -C "$temp_ssh_dir"; then
         
         if [ -d "$HOME/.ssh" ]; then
             echo " - Backing up existing .ssh to .ssh.bak..."
@@ -168,11 +166,9 @@ install_ssh() {
         find "$HOME/.ssh" -type f -name "*.pub" -exec chmod 644 {} +
         
         echo " - SSH keys installed successfully."
-        rm -f "$temp_ssh_archive"
     else
         echo " - Error: Decryption failed. No changes were made to existing SSH keys." >&2
         rm -rf "$temp_ssh_dir"
-        rm -f "$temp_ssh_archive"
         exit 1
     fi
 }
