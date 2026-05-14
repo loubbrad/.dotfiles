@@ -5,6 +5,10 @@ docker_args=(
     --gpus all
 )
 
+if [ -n "${SHARED_GID:-}" ]; then
+    docker_args+=(--group-add "$SHARED_GID")
+fi
+
 mount_volumes=false
 for arg in "$@"; do
     if [[ "$arg" == "-m" || "$arg" == "--mount" ]]; then

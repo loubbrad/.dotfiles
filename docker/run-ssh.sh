@@ -10,26 +10,21 @@ if [ ! -f "$authorized_keys" ]; then
     exit 1
 fi
 
-authorized_keys_tmp="${XDG_RUNTIME_DIR:-/tmp}/docker-${name}-authorized_keys"
-cp "$authorized_keys" "$authorized_keys_tmp"
-chmod 644 "$authorized_keys_tmp"
-
 docker_args=(
     -d
     --name "$name"
     --gpus all
     --user root
     -p "127.0.0.1:$port:22"
-    -v "$authorized_keys_tmp:/tmp/authorized_keys:ro"
+    -v "$authorized_keys:/home/ubuntu/.ssh/authorized_keys:ro"
 )
+
+if [ -n "${SHARED_GID:-}" ]; then
+    docker_args+=(--group-add "$SHARED_GID")
+fi
 
 if [ -d "$HOME/work" ]; then
     docker_args+=(-v "$HOME/work:/home/ubuntu/work")
 fi
 
-docker run "${docker_args[@]}" dev /bin/bash -lc '
-    set -euo pipefail
-    install -d -m 700 -o ubuntu -g ubuntu /home/ubuntu/.ssh
-    install -m 600 -o ubuntu -g ubuntu /tmp/authorized_keys /home/ubuntu/.ssh/authorized_keys
-    exec /usr/sbin/sshd -D -e
-'
+docker run "${docker_args[@]}" dev /usr/sbin/sshd -D -e
