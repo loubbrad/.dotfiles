@@ -1,7 +1,7 @@
 FROM nvidia/cuda:12.9.1-devel-ubuntu24.04
 
 RUN apt-get update && apt-get install -y \
-    zsh tmux git curl wget gnupg fd-find silversearcher-ag ripgrep sudo ffmpeg nvtop
+    zsh tmux git curl wget gnupg fd-find silversearcher-ag ripgrep sudo ffmpeg nvtop python3.12-dev
 
 ARG USERNAME=ubuntu
 ARG UID=1000
