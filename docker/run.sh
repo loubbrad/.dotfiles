@@ -24,4 +24,4 @@ if [ "$mount_volumes" = true ]; then
 
 fi
 
-docker run "${docker_args[@]}" dev
+docker run "${docker_args[@]}" louis-dev

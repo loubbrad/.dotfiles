@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-name="${NAME:-dev-ssh}"
+name="${NAME:-louis-dev-ssh}"
 port="${PORT:-2222}"
 authorized_keys="${AUTHORIZED_KEYS:-$HOME/.ssh/authorized_keys}"
 
@@ -27,4 +27,4 @@ if [ -d "$HOME/work" ]; then
     docker_args+=(-v "$HOME/work:/home/ubuntu/work")
 fi
 
-docker run "${docker_args[@]}" dev /usr/sbin/sshd -D -e
+docker run "${docker_args[@]}" louis-dev /usr/sbin/sshd -D -e
