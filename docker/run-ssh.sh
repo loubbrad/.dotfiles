@@ -20,11 +20,24 @@ docker_args=(
 )
 
 if [ -n "${SHARED_GID:-}" ]; then
-    docker_args+=(--group-add "$SHARED_GID")
+    docker_args+=(--group-add "$SHARED_GID" -e "SHARED_GID=$SHARED_GID")
 fi
 
 if [ -d "$HOME/work" ]; then
     docker_args+=(-v "$HOME/work:/home/ubuntu/work")
 fi
 
-docker run "${docker_args[@]}" louis-dev /usr/sbin/sshd -D -e
+docker run "${docker_args[@]}" louis-dev /bin/bash -lc '
+    set -euo pipefail
+
+    if [ -n "${SHARED_GID:-}" ]; then
+        if ! getent group "$SHARED_GID" >/dev/null; then
+            groupadd -g "$SHARED_GID" shareddev
+        fi
+
+        shared_group="$(getent group "$SHARED_GID" | cut -d: -f1)"
+        usermod -aG "$shared_group" ubuntu
+    fi
+
+    exec /usr/sbin/sshd -D -e
+'
