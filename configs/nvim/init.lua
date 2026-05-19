@@ -80,6 +80,8 @@ vim.keymap.set('n', 'N', 'Nzz')
 -- Quick fix list
 vim.keymap.set('n', '<C-j>', '<cmd>cnext<CR>zz')
 vim.keymap.set('n', '<C-k>', '<cmd>cprev<CR>zz')
+vim.keymap.set('n', '[q', '<cmd>colder<CR>', { desc = 'Older quickfix list' })
+vim.keymap.set('n', ']q', '<cmd>cnewer<CR>', { desc = 'Newer quickfix list' })
 vim.keymap.set('n', '<leader>q', function()
   local qf_open = false
   for _, win in ipairs(vim.api.nvim_list_wins()) do

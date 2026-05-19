@@ -133,6 +133,14 @@ link_configs() {
         touch "$HOME/.config/zsh/local.zsh"
         echo " - Created local.zsh for machine-specific settings"
     fi
+
+    echo "> Linking Codex skills..."
+    mkdir -p "$HOME/.codex/skills"
+    for skill in "$DOTFILES_DIR"/configs/codex/skills/*; do
+        [ -d "$skill" ] || continue
+        ln -sfnT "$skill" "$HOME/.codex/skills/$(basename "$skill")"
+        echo " - Linked Codex skill: $(basename "$skill")"
+    done
 }
 
 install_ssh() {

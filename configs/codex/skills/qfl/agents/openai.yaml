@@ -1,0 +1,4 @@
+interface:
+  display_name: "Send to Quickfix List"
+  short_description: "Send findings to Neovim quickfix"
+  default_prompt: "Use $qfl to send actionable file locations to my Neovim quickfix list."
