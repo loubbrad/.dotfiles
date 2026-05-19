@@ -208,6 +208,14 @@ local function restore(target)
   return true
 end
 
+local function move_newest()
+  local newer = history().newer
+  if newer > 0 then
+    return pcall(vim.cmd, "cnewer " .. newer)
+  end
+  return true
+end
+
 local function list_meta()
   local qf = vim.fn.getqflist({ nr = 0, id = 0, title = 1, idx = 1, size = 1 })
   return { nr = qf.nr, id = qf.id, title = qf.title, idx = qf.idx, size = qf.size }
@@ -231,6 +239,14 @@ local function list_items()
     size = qf.size,
     items = qf.items or {},
   }
+end
+
+local function notify_write(count)
+  vim.notify(
+    ("Quickfix updated: %d item%s"):format(count, count == 1 and "" or "s"),
+    vim.log.levels.INFO,
+    { title = "Codex" }
+  )
 end
 
 local function main()
@@ -266,7 +282,12 @@ local function main()
   if request.op == "write" then
     local items = request.items or {}
     if request.modify_prev == nil then
+      local newest_ok, newest_err = move_newest()
+      if not newest_ok then
+        return { ok = false, op = "write", error = tostring(newest_err) }
+      end
       vim.fn.setqflist({}, " ", { title = "Codex", items = items })
+      notify_write(#items)
       return {
         ok = true,
         op = "write",
@@ -279,6 +300,10 @@ local function main()
     end
 
     local original = history().current
+    local newest_ok, newest_err = move_newest()
+    if not newest_ok then
+      return { ok = false, op = "write", error = tostring(newest_err) }
+    end
     local ok, err = move_older(request.modify_prev)
     if not ok then
       err.op = "write"
@@ -286,6 +311,7 @@ local function main()
     end
 
     vim.fn.setqflist({}, "r", { title = "Codex", items = items })
+    notify_write(#items)
     local modified = list_meta()
     local restore_ok, restore_err = restore(original)
     local restore_error
@@ -341,7 +367,9 @@ local function remote_eval(server, request)
     emit({ ok = false, error = "remote Neovim returned non-JSON output", output = out }, 1)
   end
 
-  io.stdout:write(out, "\n")
+  if request.op ~= "write" or decoded.ok == false then
+    io.stdout:write(out, "\n")
+  end
   os.exit(decoded.ok == false and 1 or 0)
 end
 
