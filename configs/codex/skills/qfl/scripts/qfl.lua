@@ -69,13 +69,35 @@ local function parse_args()
 end
 
 local function find_server()
-  local roots = {}
-  local _, roots_out = sh("tmux list-panes -s -F '#{pane_pid}'")
-  for pid in roots_out:gmatch("%d+") do
-    roots[pid] = true
+  local tmux_pane = os.getenv("TMUX_PANE")
+  if not tmux_pane or tmux_pane == "" then
+    emit({ ok = false, error = "TMUX_PANE is not set" }, 1)
   end
-  if next(roots) == nil then
-    emit({ ok = false, error = "no tmux panes found for the current session" }, 1)
+
+  local ok_session, session_out = sh(
+    "tmux display-message -p -t " .. shell_quote(tmux_pane) .. " '#{session_id}'"
+  )
+  local session_id = trim(session_out)
+  if not ok_session or session_id == "" then
+    emit({ ok = false, error = "could not resolve tmux session for Codex pane" }, 1)
+  end
+
+  local panes = {}
+  local _, panes_out = sh(
+    "tmux list-panes -t " .. shell_quote(session_id) .. " -s -F '#{window_index}\t#{pane_index}\t#{pane_pid}'"
+  )
+  for line in panes_out:gmatch("[^\n]+") do
+    local window_index, pane_index, pane_pid = line:match("^(%d+)\t(%d+)\t(%d+)$")
+    if pane_pid then
+      panes[#panes + 1] = {
+        window_index = tonumber(window_index),
+        pane_index = tonumber(pane_index),
+        pane_pid = pane_pid,
+      }
+    end
+  end
+  if #panes == 0 then
+    emit({ ok = false, error = "no tmux panes found in Codex session" }, 1)
   end
 
   local procs = {}
@@ -87,9 +109,9 @@ local function find_server()
     end
   end
 
-  local function in_session(pid)
+  local function descends_from(pid, root)
     while pid and procs[pid] do
-      if roots[pid] then
+      if pid == root then
         return true
       end
       pid = procs[pid].ppid
@@ -116,10 +138,19 @@ local function find_server()
     return tonumber(a) < tonumber(b)
   end)
 
-  for _, pid in ipairs(pids) do
-    local p = procs[pid]
-    if p.comm == "nvim" and p.args:match("%-%-embed") and in_session(pid) and sockets[pid] then
-      return sockets[pid]
+  table.sort(panes, function(a, b)
+    if a.window_index ~= b.window_index then
+      return a.window_index < b.window_index
+    end
+    return a.pane_index < b.pane_index
+  end)
+
+  for _, pane in ipairs(panes) do
+    for _, pid in ipairs(pids) do
+      local p = procs[pid]
+      if p.comm == "nvim" and p.args:match("%-%-embed") and sockets[pid] and descends_from(pid, pane.pane_pid) then
+        return sockets[pid]
+      end
     end
   end
 
@@ -247,6 +278,11 @@ local function notify_write(count)
     vim.log.levels.INFO,
     { title = "Codex" }
   )
+  if vim.env.TMUX then
+    pcall(function()
+      io.write("\7")
+    end)
+  end
 end
 
 local function main()
