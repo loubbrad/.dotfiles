@@ -12,8 +12,10 @@ export PATH="$HOME/.local/bin:$PATH"
 HISTSIZE=10000
 SAVEHIST=10000
 HISTFILE=~/.cache/zsh/history
+mkdir -p "${HISTFILE:h}"
 
-setopt INC_APPEND_HISTORY
+# SHARE_HISTORY also appends each command as it is accepted. Keeping
+# INC_APPEND_HISTORY on at the same time can make cross-pane imports noisy.
 setopt SHARE_HISTORY
 setopt HIST_IGNORE_ALL_DUPS
 
@@ -38,9 +40,13 @@ _comp_options+=(globdots) # Include hidden files.
 bindkey -v
 bindkey "^H" backward-delete-char
 bindkey "^?" backward-delete-char
+bindkey -M viins "^[[A" up-line-or-history
+bindkey -M viins "^[[B" down-line-or-history
+[[ -n "${terminfo[kcuu1]}" ]] && bindkey -M viins "${terminfo[kcuu1]}" up-line-or-history
+[[ -n "${terminfo[kcud1]}" ]] && bindkey -M viins "${terminfo[kcud1]}" down-line-or-history
 bindkey '^k' up-line-or-history
 bindkey '^j' down-line-or-history
-export KEYTIMEOUT=1
+export KEYTIMEOUT=5
 autoload edit-command-line
 zle -N edit-command-line
 bindkey -M viins '^E' edit-command-line
@@ -60,10 +66,15 @@ function zle-keymap-select {
 }
 zle -N zle-keymap-select
 zle-line-init() {
+    [[ -n "${terminfo[smkx]}" ]] && printf '%s' "${terminfo[smkx]}"
     zle -K viins # initiate `vi insert` as keymap (can be removed if `bindkey -V` has been set elsewhere)
     echo -ne "\e[5 q"
 }
 zle -N zle-line-init
+zle-line-finish() {
+    [[ -n "${terminfo[rmkx]}" ]] && printf '%s' "${terminfo[rmkx]}"
+}
+zle -N zle-line-finish
 echo -ne '\e[5 q' # Use beam shape cursor on startup.
 preexec() { echo -ne '\e[5 q' ;} # Use beam shape cursor for each new prompt.
 
@@ -71,4 +82,3 @@ preexec() { echo -ne '\e[5 q' ;} # Use beam shape cursor for each new prompt.
 if [[ -f "$HOME/.config/zsh/local.zsh" ]]; then
   source "$HOME/.config/zsh/local.zsh"
 fi
-
