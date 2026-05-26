@@ -20,6 +20,7 @@ vim.api.nvim_set_hl(0, "WinSeparator", { fg = "#444444" })
 require('color').setup()
 require('statusline').setup()
 require('commands').setup()
+require('codex_qfl').setup()
 
 -- Cache history
 local undo_dir = vim.fn.stdpath('cache') .. '/undo'

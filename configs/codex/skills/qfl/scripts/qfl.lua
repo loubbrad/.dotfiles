@@ -22,6 +22,24 @@ local function sh(cmd)
   return ok, out, code
 end
 
+local function read_file(path)
+  local f = io.open(path, "r")
+  if not f then
+    return nil
+  end
+  local out = f:read("*a")
+  f:close()
+  return out
+end
+
+local function registry_dir()
+  local runtime_dir = os.getenv("XDG_RUNTIME_DIR")
+  if runtime_dir and runtime_dir ~= "" then
+    return runtime_dir .. "/codex-qfl-nvim"
+  end
+  return "/tmp/codex-qfl-nvim-" .. (os.getenv("USER") or "user")
+end
+
 local function parse_nonnegative(value, name)
   if value == nil then
     return nil
@@ -84,59 +102,21 @@ local function find_server()
 
   local panes = {}
   local _, panes_out = sh(
-    "tmux list-panes -t " .. shell_quote(session_id) .. " -s -F '#{window_index}\t#{pane_index}\t#{pane_pid}'"
+    "tmux list-panes -t " .. shell_quote(session_id) .. " -s -F '#{pane_id}\t#{window_index}\t#{pane_index}'"
   )
   for line in panes_out:gmatch("[^\n]+") do
-    local window_index, pane_index, pane_pid = line:match("^(%d+)\t(%d+)\t(%d+)$")
-    if pane_pid then
+    local pane_id, window_index, pane_index = line:match("^(%%?%d+)\t(%d+)\t(%d+)$")
+    if pane_id then
       panes[#panes + 1] = {
+        pane_id = pane_id,
         window_index = tonumber(window_index),
         pane_index = tonumber(pane_index),
-        pane_pid = pane_pid,
       }
     end
   end
   if #panes == 0 then
     emit({ ok = false, error = "no tmux panes found in Codex session" }, 1)
   end
-
-  local procs = {}
-  local _, ps_out = sh("ps -eo pid=,ppid=,comm=,args=")
-  for line in ps_out:gmatch("[^\n]+") do
-    local pid, ppid, comm, args = line:match("^%s*(%d+)%s+(%d+)%s+(%S+)%s+(.*)$")
-    if pid then
-      procs[pid] = { ppid = ppid, comm = comm, args = args }
-    end
-  end
-
-  local function descends_from(pid, root)
-    while pid and procs[pid] do
-      if pid == root then
-        return true
-      end
-      pid = procs[pid].ppid
-    end
-    return false
-  end
-
-  local user = os.getenv("USER")
-  if not user then
-    emit({ ok = false, error = "USER is not set" }, 1)
-  end
-
-  local sockets = {}
-  local _, socket_out = sh(("find %s -type s -name 'nvim.*.0' 2>/dev/null"):format(shell_quote("/tmp/nvim." .. user)))
-  for s in socket_out:gmatch("[^\n]+") do
-    sockets[s:match("nvim%.(%d+)%.0$")] = s
-  end
-
-  local pids = {}
-  for pid in pairs(procs) do
-    pids[#pids + 1] = pid
-  end
-  table.sort(pids, function(a, b)
-    return tonumber(a) < tonumber(b)
-  end)
 
   table.sort(panes, function(a, b)
     if a.window_index ~= b.window_index then
@@ -146,15 +126,20 @@ local function find_server()
   end)
 
   for _, pane in ipairs(panes) do
-    for _, pid in ipairs(pids) do
-      local p = procs[pid]
-      if p.comm == "nvim" and p.args:match("%-%-embed") and sockets[pid] and descends_from(pid, pane.pane_pid) then
-        return sockets[pid]
+    local data = read_file(registry_dir() .. "/" .. pane.pane_id .. ".json")
+    if data then
+      local ok, decoded = pcall(vim.json.decode, data)
+      local server = ok and decoded.server
+      if type(server) == "string" and server ~= "" then
+        local stat = server:sub(1, 1) == "/" and vim.uv.fs_stat(server) or true
+        if stat then
+          return server
+        end
       end
     end
   end
 
-  emit({ ok = false, error = "no Neovim server found in the current tmux session" }, 1)
+  emit({ ok = false, error = "no registered Neovim server found in the current tmux session" }, 1)
 end
 
 local function decode_entries(input)
