@@ -18,10 +18,41 @@ local function smart_split(selected, opts)
     end)
 end
 
+-- Used to manipulates splits in term mode
+local function fzf_wincmd(e)
+    local key = vim.fn.getcharstr()
+    local valid = {
+        h = true, j = true, k = true, l = true,
+        H = true, J = true, K = true, L = true,
+        o = true, w = true, p = true,
+        ["="] = true, ["_"] = true, ["|"] = true,
+        ["+"] = true, ["-"] = true, ["<"] = true, [">"] = true,
+    }
+
+    if valid[key] and vim.api.nvim_win_is_valid(e.winid) then
+        vim.api.nvim_set_current_win(e.winid)
+        pcall(vim.cmd, "wincmd " .. key)
+    end
+
+    vim.cmd("startinsert")
+end
+
 fzf.setup({
+    {"fzf-vim"},
     winopts = {
-        border   = "single",
-        preview = { border = "single" },
+        split = "botright 12new",
+        preview = {
+            border = "single",
+            scrollbar = false,
+        },
+        on_create = function(e)
+            vim.keymap.set({ "t", "n" }, "<leader>w", function()
+                fzf_wincmd(e)
+            end, { buffer = e.bufnr, nowait = true, silent = true })
+        end,
+    },
+    fzf_opts = {
+        ["--layout"] = "reverse",
     },
     actions = {
         files = {
@@ -50,6 +81,11 @@ fzf.setup({
         },
     }
 })
+
+-- Remove ugly background
+vim.api.nvim_set_hl(0, "fzf1", { fg = "#E12672", bg = "NONE" })
+vim.api.nvim_set_hl(0, "fzf2", { fg = "#BCDDBD", bg = "NONE" })
+vim.api.nvim_set_hl(0, "fzf3", { fg = "#D9D9D9", bg = "NONE" })
 
 vim.keymap.set('n', '<leader>ff', fzf.files, { desc = 'Fzf Files' })
 vim.keymap.set('n', '<leader>fd', fzf.diagnostics_document, { desc = 'Fzf Diagnostics' })

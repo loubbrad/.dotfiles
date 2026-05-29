@@ -46,6 +46,7 @@ vim.keymap.set('n', '<leader>gq', 'vipgq', { remap = true })
 -- Window qol
 vim.opt.fillchars = { vert = "|" }
 vim.opt.splitright = true
+vim.opt.splitkeep = "screen"
 vim.opt.laststatus = 3
 vim.keymap.set('n', ']b', '<cmd>bnext<CR>')
 vim.keymap.set('n', '[b', '<cmd>bprev<CR>')
@@ -95,7 +96,7 @@ vim.keymap.set('n', '<leader>q', function()
   if qf_open then
     vim.cmd('cclose')
   else
-    vim.cmd('copen')
+    vim.cmd('botright 12copen')
   end
 end)
 
