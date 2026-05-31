@@ -43,6 +43,16 @@ function M.smart_split_action(callback, target_win)
   end
 end
 
+function M.toggle_float(get_win, open)
+  local win = get_win()
+  if win and vim.api.nvim_win_is_valid(win) then
+    vim.api.nvim_win_close(win, true)
+    return
+  end
+
+  open()
+end
+
 function M.send_to_agent()
   if not os.getenv("TMUX") then
     vim.notify("Not in tmux", vim.log.levels.ERROR)

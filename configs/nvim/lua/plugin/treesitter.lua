@@ -4,7 +4,7 @@ vim.pack.add({
 }, { confirm = false })
 
 local ts = require('nvim-treesitter')
-ts.install({ "python", "lua", "bash", "c", "cpp", "cuda" }, { summary = false })
+ts.install({ "python", "lua", "bash", "c", "cpp", "cuda", "zig" }, { summary = false })
 
 vim.api.nvim_create_autocmd('FileType', {
   callback = function(args)

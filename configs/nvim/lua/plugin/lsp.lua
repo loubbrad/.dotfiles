@@ -33,6 +33,13 @@ require('blink.cmp').setup({
     },
 })
 
+local function toggle_lsp_float(open)
+    require('commands').toggle_float(
+        function() return vim.b.lsp_floating_preview end,
+        open
+    )
+end
+
 vim.api.nvim_create_autocmd('LspAttach', {
     callback = function(event)
         local opts = { buffer = event.buf }
@@ -40,10 +47,14 @@ vim.api.nvim_create_autocmd('LspAttach', {
         vim.keymap.set('n', 'gd', function() require('fzf-lua').lsp_definitions() end, opts)
         vim.keymap.set('n', 'gr', function() require('fzf-lua').lsp_references() end, opts)
         vim.keymap.set('n', '<leader>rn', vim.lsp.buf.rename, opts)
-        vim.keymap.set('n', '<C-h>', vim.lsp.buf.hover, opts)
+        vim.keymap.set('n', '<C-l>', function()
+            toggle_lsp_float(function() vim.lsp.buf.hover({ border = "single" }) end)
+        end, opts)
         vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, opts)
         vim.keymap.set('n', ']d', vim.diagnostic.goto_next, opts)
-        vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float, opts)
+        vim.keymap.set('n', '<C-e>', function()
+            toggle_lsp_float(function() vim.diagnostic.open_float({ border = "single" }) end)
+        end, opts)
     end,
 })
 
@@ -62,6 +73,11 @@ local servers = {
     bashls = {
         cmd = { 'bash-language-server', 'start' },
         filetypes = { 'sh', 'bash', 'zsh' },
+    },
+    zls = {
+        cmd = { 'zls' },
+        filetypes = { 'zig' },
+        root_markers = { 'build.zig' },
     },
 }
 
