@@ -6,6 +6,7 @@ DOTFILES_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &> /dev/null && pwd)
 export PATH="$HOME/.local/bin:$HOME/.fzf/bin:$PATH"
 INSTALL_UV=false
 INSTALL_SSH=false
+INSTALL_ZIG=false
 SHELL_RESTART_REQUIRED=false
 NO_ROOT=false
 
@@ -16,6 +17,10 @@ for arg in "$@"; do
       ;;
     --ssh)
       INSTALL_SSH=true
+      shift
+      ;;
+    --zig)
+      INSTALL_ZIG=true
       shift
       ;;
     --no-root)
@@ -56,49 +61,57 @@ glibc_at_least() {
 }
 
 install_binaries() {
-    if glibc_at_least 2.34; then
-        NVIM_URL="https://github.com/neovim/neovim/releases/latest/download/nvim-linux-x86_64.tar.gz"
-    elif glibc_at_least 2.17; then
-        echo "> GLIBC $SYSTEM_GLIBC too old for latest neovim, using fallback"
-        NVIM_URL="https://github.com/neovim/neovim-releases/releases/latest/download/nvim-linux-x86_64.tar.gz"
-    else
-        NVIM_URL=""
-        echo "> GLIBC $SYSTEM_GLIBC too old for neovim binary install, skipping"
-    fi
+    (
+        local nvim_url
+        local tree_sitter_url
+        local temp_dir
 
-    if glibc_at_least 2.39; then
-        TREE_SITTER_URL="https://github.com/tree-sitter/tree-sitter/releases/latest/download/tree-sitter-linux-x64.gz"
-    elif glibc_at_least 2.34; then 
-        TREE_SITTER_URL="https://github.com/tree-sitter/tree-sitter/releases/download/v0.25.10/tree-sitter-linux-x64.gz"
-    else
-        TREE_SITTER_URL=""
-        echo "> GLIBC $SYSTEM_GLIBC too old for tree-sitter binary install, skipping"
-    fi
+        temp_dir=$(mktemp -d)
+        trap "rm -rf '$temp_dir'" EXIT
 
-    if [ -n "$NVIM_URL" ] && ! command -v nvim >/dev/null 2>&1 && [ ! -x "$HOME/.local/bin/nvim" ]; then
-        echo "> Installing Neovim from $NVIM_URL..."
-        mkdir -p "$HOME/nvim"
-        curl -L "$NVIM_URL" -o nvim.tar.gz
-        tar -C "$HOME/nvim" -xzf nvim.tar.gz --strip-components=1
-        rm nvim.tar.gz
-        ln -sf "$HOME/nvim/bin/nvim" "$HOME/.local/bin/nvim"
-    fi
+        if glibc_at_least 2.34; then
+            nvim_url="https://github.com/neovim/neovim/releases/latest/download/nvim-linux-x86_64.tar.gz"
+        elif glibc_at_least 2.17; then
+            echo "> GLIBC $SYSTEM_GLIBC too old for latest neovim, using fallback"
+            nvim_url="https://github.com/neovim/neovim-releases/releases/latest/download/nvim-linux-x86_64.tar.gz"
+        else
+            nvim_url=""
+            echo "> GLIBC $SYSTEM_GLIBC too old for neovim binary install, skipping"
+        fi
 
-    if ! command -v fzf >/dev/null 2>&1 && [ ! -x "$HOME/.fzf/bin/fzf" ]; then
-        echo "> Installing FZF..."
-        [ -d "$HOME/.fzf/.git" ] || git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
-        ~/.fzf/install --all --no-update-rc 
-    fi
+        if glibc_at_least 2.39; then
+            tree_sitter_url="https://github.com/tree-sitter/tree-sitter/releases/latest/download/tree-sitter-linux-x64.gz"
+        elif glibc_at_least 2.34; then
+            tree_sitter_url="https://github.com/tree-sitter/tree-sitter/releases/download/v0.25.10/tree-sitter-linux-x64.gz"
+        else
+            tree_sitter_url=""
+            echo "> GLIBC $SYSTEM_GLIBC too old for tree-sitter binary install, skipping"
+        fi
 
-    if [ -n "$TREE_SITTER_URL" ] && ! command -v tree-sitter >/dev/null 2>&1; then
-        echo "> Installing Tree-sitter from $TREE_SITTER_URL..."
-        curl -L "$TREE_SITTER_URL" -o tree-sitter.gz
-        gzip -d tree-sitter.gz
-        chmod +x tree-sitter
-        mv tree-sitter "$HOME/.local/bin/tree-sitter"
-    fi
+        if [ -n "$nvim_url" ] && ! command -v nvim >/dev/null 2>&1 && [ ! -x "$HOME/.local/bin/nvim" ]; then
+            echo "> Installing Neovim from $nvim_url..."
+            mkdir -p "$HOME/nvim"
+            curl -fL "$nvim_url" -o "$temp_dir/nvim.tar.gz"
+            tar -C "$HOME/nvim" -xzf "$temp_dir/nvim.tar.gz" --strip-components=1
+            ln -sf "$HOME/nvim/bin/nvim" "$HOME/.local/bin/nvim"
+        fi
 
-    echo "> Binary installation complete."
+        if ! command -v fzf >/dev/null 2>&1 && [ ! -x "$HOME/.fzf/bin/fzf" ]; then
+            echo "> Installing FZF..."
+            [ -d "$HOME/.fzf/.git" ] || git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
+            ~/.fzf/install --all --no-update-rc
+        fi
+
+        if [ -n "$tree_sitter_url" ] && ! command -v tree-sitter >/dev/null 2>&1; then
+            echo "> Installing Tree-sitter from $tree_sitter_url..."
+            curl -fL "$tree_sitter_url" -o "$temp_dir/tree-sitter.gz"
+            gzip -d "$temp_dir/tree-sitter.gz"
+            chmod +x "$temp_dir/tree-sitter"
+            mv "$temp_dir/tree-sitter" "$HOME/.local/bin/tree-sitter"
+        fi
+
+        echo "> Binary installation complete."
+    )
 }
 
 install_uv() {
@@ -106,6 +119,35 @@ install_uv() {
         echo "> Installing uv..."
         curl -LsSf https://astral.sh/uv/install.sh | sh
     fi
+}
+
+install_zig() {
+    (
+        local zig_version="0.16.0"
+        local zig_dir="$HOME/.local/lib/zig-x86_64-linux-$zig_version"
+        local zig_url="https://ziglang.org/download/$zig_version/zig-x86_64-linux-$zig_version.tar.xz"
+        local zls_url="https://builds.zigtools.org/zls-x86_64-linux-$zig_version.tar.xz"
+        local temp_dir
+
+        temp_dir=$(mktemp -d)
+        trap "rm -rf '$temp_dir'" EXIT
+
+        mkdir -p "$HOME/.local/lib"
+
+        if [ "$(zig version 2>/dev/null || true)" != "$zig_version" ]; then
+            echo "> Installing Zig $zig_version..."
+            curl -fL "$zig_url" -o "$temp_dir/zig.tar.xz"
+            rm -rf "$zig_dir"
+            tar -xf "$temp_dir/zig.tar.xz" -C "$HOME/.local/lib"
+            ln -sfn "$zig_dir/zig" "$HOME/.local/bin/zig"
+        fi
+
+        if [ "$(zls --version 2>/dev/null || true)" != "$zig_version" ]; then
+            echo "> Installing ZLS $zig_version..."
+            curl -fL "$zls_url" -o "$temp_dir/zls.tar.xz"
+            tar -xf "$temp_dir/zls.tar.xz" -C "$HOME/.local/bin"
+        fi
+    )
 }
 
 link_configs() {
@@ -194,6 +236,10 @@ main() {
 
     if [ "$INSTALL_UV" = true ]; then
         install_uv
+    fi
+
+    if [ "$INSTALL_ZIG" = true ]; then
+        install_zig
     fi
 
     if [ "$INSTALL_SSH" = true ]; then
