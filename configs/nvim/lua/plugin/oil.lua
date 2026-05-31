@@ -4,6 +4,12 @@ vim.pack.add({
 
 local oil = require("oil")
 
+function _G.get_oil_winbar()
+    local bufnr = vim.api.nvim_win_get_buf(vim.g.statusline_winid)
+    local dir = oil.get_current_dir(bufnr)
+    return dir and vim.fn.fnamemodify(dir, ":~") or vim.api.nvim_buf_get_name(bufnr)
+end
+
 local function oil_parent()
     local dir = oil.get_current_dir()
     local child_dirs = vim.t.oil_child_dirs or {}
@@ -42,6 +48,9 @@ end
 oil.setup({
     default_file_explorer = true,
     view_options = { show_hidden = true },
+    win_options = {
+        winbar = "%!v:lua.get_oil_winbar()",
+    },
     float = {
         padding = 0,
         border = "none",
