@@ -20,6 +20,7 @@ function M.setup()
     local highlights = {
         ["Normal"]             = { fg = c.vscFront, bg = 'NONE' },
         ["NormalNC"]           = { fg = c.vscFront, bg = 'NONE' },
+        ["NormalFloat"]        = { fg = c.vscFront, bg = 'NONE' },
         ["SignColumn"]         = { bg = 'NONE' },
         ["LineNr"]             = { fg = c.vscGray, bg = 'NONE' },
         ["WinSeparator"]       = { fg = '#444444', bg = 'NONE' },
@@ -68,6 +69,7 @@ function M.setup()
         ["@lsp.type.parameter"]  = { fg = c.vscLightBlue },
         ["@lsp.type.function"]   = { fg = c.vscYellow },
         ["@lsp.type.method"]     = { fg = c.vscYellow },
+        ["@lsp.type.type"]       = { fg = c.vscBlueGreen },
         ["@lsp.type.namespace"]  = { fg = c.vscBlueGreen },  
         ["@lsp.type.class"]      = { fg = c.vscBlueGreen },
         ["@lsp.type.property"]   = { fg = c.vscLightBlue },
