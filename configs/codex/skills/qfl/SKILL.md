@@ -1,11 +1,11 @@
 ---
 name: Send to Quickfix List
-description: Use automatically during code sessions whenever concrete local file locations would help the user navigate the work. Do not wait for the user to ask. Populate the current tmux session's Neovim quickfix list quietly, but avoid adding incidental files that were only read for context.
+description: Use when the user asks to send jumpable code locations to Neovim quickfix/qfl, or asks to show, list, surface, collect, or navigate code locations. Do not use for ordinary explanations, edits, reviews, searches, tests, summaries, diffs, or command output unless the user explicitly asks for qfl/quickfix or navigable locations.
 ---
 
 # qfl
 
-Use this skill to send useful file locations to the Neovim quickfix list in the current tmux session.
+Use this skill to send requested file locations to the Neovim quickfix list in the current tmux session.
 
 ## Commands
 
@@ -25,7 +25,7 @@ Each stdin line for `write` is one JSON quickfix object. Prefer absolute `filena
 ## Behavior
 
 - Rely on the documented commands; do not inspect the script or call `read` on startup.
-- Use automatically during code sessions whenever concrete local files/lines would help the user navigate the work: diagnostics, review findings, bugs, search results, TODOs, implementation touchpoints, or code-grounded refactor/design discussion. Do not wait for the user to ask.
+- Use only when the user asks for qfl/quickfix or when the requested output is primarily jumpable code locations; otherwise answer in chat.
 - Skip incidental context files, purely conceptual discussion, and path mentions used only for attribution.
 - Prefer 3-8 high-signal entries over exhaustive references.
 - Create a new history entry by default. Use `--modify-prev=N` only when deliberately revising an existing quickfix list; `N` is always relative to newest.
