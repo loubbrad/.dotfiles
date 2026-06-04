@@ -80,8 +80,22 @@ vim.keymap.set('n', 'n', 'nzz')
 vim.keymap.set('n', 'N', 'Nzz')
 
 -- Quick fix list
-vim.keymap.set('n', '<C-j>', '<cmd>cnext<CR>zz')
-vim.keymap.set('n', '<C-k>', '<cmd>cprev<CR>zz')
+local function quickfix_jump(command)
+  local qf = vim.fn.getqflist({ size = 0 })
+  if qf.size == 1 then
+    vim.cmd('cfirst')
+  else
+    vim.cmd(command)
+  end
+  vim.cmd('normal! zz')
+end
+
+vim.keymap.set('n', '<C-j>', function()
+  quickfix_jump('cnext')
+end)
+vim.keymap.set('n', '<C-k>', function()
+  quickfix_jump('cprev')
+end)
 vim.keymap.set('n', '[q', '<cmd>colder<CR>', { desc = 'Older quickfix list' })
 vim.keymap.set('n', ']q', '<cmd>cnewer<CR>', { desc = 'Newer quickfix list' })
 vim.keymap.set('n', '<leader>q', function()
