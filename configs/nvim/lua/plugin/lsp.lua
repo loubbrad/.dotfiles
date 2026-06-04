@@ -60,6 +60,10 @@ vim.api.nvim_create_autocmd('LspAttach', {
 
 local capabilities = require('blink.cmp').get_lsp_capabilities()
 
+local function disable_semantic_tokens(client)
+    client.server_capabilities.semanticTokensProvider = nil
+end
+
 local servers = {
     ty = {
         cmd = { 'ty', 'server' },
@@ -78,6 +82,7 @@ local servers = {
         cmd = { 'zls' },
         filetypes = { 'zig' },
         root_markers = { 'build.zig' },
+        on_attach = disable_semantic_tokens,
     },
 }
 

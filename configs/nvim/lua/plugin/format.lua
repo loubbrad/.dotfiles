@@ -5,9 +5,11 @@ vim.pack.add({
 require("conform").setup({
     formatters_by_ft = {
         python = { "ruff_format" },
+        zig = { "zigfmt" },
     },
     format_on_save = {
         timeout_ms = 1000,
+        quiet = true,
     },
     formatters = {
         ruff_format = {

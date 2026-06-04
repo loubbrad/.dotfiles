@@ -18,25 +18,30 @@ function M.setup()
     }
 
     local highlights = {
+        -- UI
         ["Normal"]             = { fg = c.vscFront, bg = 'NONE' },
         ["NormalNC"]           = { fg = c.vscFront, bg = 'NONE' },
         ["NormalFloat"]        = { fg = c.vscFront, bg = 'NONE' },
         ["SignColumn"]         = { bg = 'NONE' },
         ["LineNr"]             = { fg = c.vscGray, bg = 'NONE' },
         ["WinSeparator"]       = { fg = '#444444', bg = 'NONE' },
+
+        -- Diagnostics
         ["DiagnosticError"]    = { fg = c.vscRed },
         ["DiagnosticWarn"]     = { fg = c.vscYellow },
         ["DiagnosticInfo"]     = { fg = c.vscBlue },
         ["DiagnosticHint"]     = { fg = c.vscBlue },
         ["DiagnosticUnderlineError"] = { fg = c.vscRed, underline = true },
+
+        -- Tree-sitter
         ["@variable"]          = { fg = c.vscLightBlue }, 
         ["@variable.member"]   = { fg = c.vscLightBlue }, 
         ["@variable.parameter"]= { fg = c.vscLightBlue },
         ["@variable.import"]    = { fg = c.vscLightBlue }, 
-        ["@module"]            = { link = "Normal" }, 
+        ["@module"]            = { fg = c.vscBlueGreen },
         ["@property"]          = { link = "Normal" },  -- ? 
-        ["@function"]          = { link = "Normal" },
-        ["@function.call"]     = { link = "Normal" },
+        ["@function"]          = { fg = c.vscYellow },
+        ["@function.call"]     = { fg = c.vscYellow },
         ["@function.builtin"]  = { fg = c.vscYellow },
         ["@attribute"]         = { fg = c.vscYellow }, 
         ["@keyword"]           = { fg = c.vscPink },
@@ -48,8 +53,8 @@ function M.setup()
         ["@variable.builtin"]  = { fg = c.vscBlue }, 
         ["@include"]           = { fg = c.vscPink }, 
         ["@exception"]         = { fg = c.vscPink },
-        ["@constructor"]       = { link = "Normal" },
-        ["@type"]              = { link = "Normal" },
+        ["@constructor"]       = { fg = c.vscBlueGreen },
+        ["@type"]              = { fg = c.vscBlueGreen },
         ["@type.builtin"]      = { fg = c.vscBlueGreen },  
         ["@structure"]         = { fg = c.vscBlueGreen },
         ["@string"]            = { fg = c.vscOrange },
@@ -65,6 +70,8 @@ function M.setup()
         ["@tag"]               = { fg = c.vscBlue },
         ["@tag.attribute"]     = { fg = c.vscLightBlue },
         ["@tag.delimiter"]     = { fg = c.vscGray },
+
+        -- LSP semantic tokens
         ["@lsp.type.variable"]   = { fg = c.vscLightBlue },
         ["@lsp.type.parameter"]  = { fg = c.vscLightBlue },
         ["@lsp.type.function"]   = { fg = c.vscYellow },
@@ -79,6 +86,20 @@ function M.setup()
         ["@lsp.type.decorator"] = { link = "@attribute" },
         ["@lsp.mod.readonly"] = { link = "@constant" },
         ["@lsp.typemod.variable.readonly"] = { link = "@constant" },
+
+        -- Python
+        ["@module.python"]             = { link = "Normal" },
+        ["@variable.python"]           = { link = "Normal" },
+        ["@variable.member.python"]    = { link = "Normal" },
+        ["@variable.import.python"]    = { link = "Normal" },
+        ["@constant.python"]           = { link = "Normal" },
+        ["@function.python"]           = { link = "Normal" },
+        ["@function.call.python"]      = { link = "Normal" },
+        ["@function.method.python"]    = { link = "Normal" },
+        ["@function.method.call.python"] = { link = "Normal" },
+        ["@constructor.python"]        = { link = "Normal" },
+        ["@type.python"]               = { link = "Normal" },
+        ["@type.definition.python"]    = { link = "Normal" },
         ["@keyword.operator.python"]  = { fg = c.vscBlue },
     }
 
