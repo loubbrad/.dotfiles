@@ -1,50 +1,25 @@
 #!/usr/bin/env python3
 import argparse
+import os
 import shutil
-import subprocess
 import sys
-import tarfile
 import tempfile
+from datetime import datetime
 from pathlib import Path
 
 
-SKIP_NAMES = {"authorized_keys"}
+BACKUP_DIR_NAME = "backups"
+PROTECTED_NAMES = {"authorized_keys", "authorized_keys2"}
 
 
 def parse_args():
-    default_archive = Path(__file__).with_name("ssh_archive.tar.gz.gpg")
     parser = argparse.ArgumentParser(
-        description="Extract encrypted SSH files into ~/.ssh without touching authorized_keys."
+        description="Merge staged SSH files into ~/.ssh without touching authorized keys."
     )
-    parser.add_argument("--archive", type=Path, default=default_archive)
+    parser.add_argument("--source-dir", type=Path, required=True)
     parser.add_argument("--ssh-dir", type=Path, default=Path.home() / ".ssh")
     parser.add_argument("--dry-run", action="store_true")
     return parser.parse_args()
-
-
-def safe_member(member):
-    path = Path(member.name)
-    return not path.is_absolute() and ".." not in path.parts
-
-
-def extract_archive(archive, target):
-    proc = subprocess.Popen(["gpg", "--decrypt", str(archive)], stdout=subprocess.PIPE)
-    try:
-        with tarfile.open(fileobj=proc.stdout, mode="r|gz") as tar:
-            for member in tar:
-                if not safe_member(member):
-                    raise RuntimeError(f"unsafe archive path: {member.name}")
-                if member.issym() or member.islnk():
-                    print(f"skipping link: {member.name}", file=sys.stderr)
-                    continue
-                tar.extract(member, target)
-    except Exception:
-        proc.kill()
-        proc.wait()
-        raise
-
-    if proc.wait() != 0:
-        raise RuntimeError("gpg failed to decrypt the archive")
 
 
 def ssh_relative_path(path, root):
@@ -57,55 +32,129 @@ def ssh_relative_path(path, root):
     return rel
 
 
-def install_file(src, dst, dry_run):
-    if dry_run:
-        print(f"would install {dst}")
+def secure_directory(path, root):
+    path.mkdir(mode=0o700, parents=True, exist_ok=True)
+    while True:
+        path.chmod(0o700)
+        if path == root:
+            return
+        path = path.parent
+
+
+def build_plan(files, staging_dir, ssh_dir):
+    plan = []
+    destinations = set()
+
+    for src in sorted(files):
+        rel = ssh_relative_path(src, staging_dir)
+        if rel is None:
+            continue
+        if rel.name in PROTECTED_NAMES:
+            print(f"skipping protected file: {ssh_dir / rel}")
+            continue
+        if rel.parts[0] == BACKUP_DIR_NAME:
+            raise RuntimeError(f"archive targets reserved directory: {rel}")
+
+        dst = ssh_dir / rel
+        resolved = dst.resolve()
+        if not resolved.is_relative_to(ssh_dir):
+            raise RuntimeError(f"unsafe destination: {dst}")
+        if dst.is_symlink():
+            raise RuntimeError(f"refusing to replace symlink: {dst}")
+        if dst.exists() and not dst.is_file():
+            raise RuntimeError(f"destination is not a regular file: {dst}")
+        if resolved in destinations:
+            raise RuntimeError(f"duplicate destination in archive: {dst}")
+
+        destinations.add(resolved)
+        plan.append((src, dst, rel))
+
+    return plan
+
+
+def backup_replacements(plan, ssh_dir):
+    replacements = [(dst, rel) for _, dst, rel in plan if dst.exists()]
+    if not replacements:
         return
 
-    dst.parent.mkdir(parents=True, exist_ok=True)
-    shutil.copyfile(src, dst)
-    dst.chmod(0o644 if dst.name.endswith(".pub") else 0o600)
+    backup_root = ssh_dir / BACKUP_DIR_NAME
+    if backup_root.is_symlink() or (backup_root.exists() and not backup_root.is_dir()):
+        raise RuntimeError(f"unsafe backup directory: {backup_root}")
+
+    timestamp = datetime.now().strftime("%Y%m%d-%H%M%S-%f")
+    backup_dir = backup_root / timestamp
+    secure_directory(backup_dir, ssh_dir)
+
+    for src, rel in replacements:
+        dst = backup_dir / rel
+        secure_directory(dst.parent, ssh_dir)
+        shutil.copy2(src, dst)
+        print(f"backed up {src} -> {dst}")
+
+
+def install_file(src, dst, ssh_dir):
+    secure_directory(dst.parent, ssh_dir)
+    mode = 0o644 if dst.name.endswith(".pub") else 0o600
+
+    with tempfile.NamedTemporaryFile(dir=dst.parent, delete=False) as output:
+        tmp = Path(output.name)
+        with src.open("rb") as input_file:
+            shutil.copyfileobj(input_file, output)
+
+    try:
+        tmp.chmod(mode)
+        os.replace(tmp, dst)
+    finally:
+        tmp.unlink(missing_ok=True)
     print(f"installed {dst}")
 
 
 def main():
     args = parse_args()
-    archive = args.archive.expanduser()
-    ssh_dir = args.ssh_dir.expanduser()
+    source_dir = args.source_dir.expanduser().resolve()
+    ssh_dir = args.ssh_dir.expanduser().resolve()
 
-    if not archive.is_file():
-        print(f"missing archive: {archive}", file=sys.stderr)
+    if not source_dir.is_dir():
+        print(f"missing source directory: {source_dir}", file=sys.stderr)
         return 1
 
-    with tempfile.TemporaryDirectory() as tmp:
-        tmp_path = Path(tmp)
-        extract_archive(archive, tmp_path)
+    entries = list(source_dir.rglob("*"))
+    unsafe = [
+        path
+        for path in entries
+        if path.is_symlink() or not (path.is_file() or path.is_dir())
+    ]
+    if unsafe:
+        raise RuntimeError(f"source contains an unsafe entry: {unsafe[0]}")
 
-        files = [path for path in tmp_path.rglob("*") if path.is_file()]
-        if not files:
-            print("archive did not contain any regular files", file=sys.stderr)
-            return 1
+    files = [path for path in entries if path.is_file()]
+    if not files:
+        print("source did not contain any regular files", file=sys.stderr)
+        return 1
 
-        if not args.dry_run:
-            ssh_dir.mkdir(mode=0o700, parents=True, exist_ok=True)
-            ssh_dir.chmod(0o700)
+    plan = build_plan(files, source_dir, ssh_dir)
+    if not plan:
+        print("source did not contain any installable files", file=sys.stderr)
+        return 1
 
-        for src in files:
-            rel = ssh_relative_path(src, tmp_path)
-            if rel is None:
-                continue
-            if rel.name in SKIP_NAMES:
-                print(f"skipping {ssh_dir / rel}")
-                continue
+    if args.dry_run:
+        for _, dst, _ in plan:
+            action = "replace" if dst.exists() else "install"
+            print(f"would {action} {dst}")
+        return 0
 
-            dst = ssh_dir / rel
-            if not dst.resolve().is_relative_to(ssh_dir.resolve()):
-                print(f"skipping unsafe destination: {dst}", file=sys.stderr)
-                continue
-            install_file(src, dst, args.dry_run)
+    secure_directory(ssh_dir, ssh_dir)
+    backup_replacements(plan, ssh_dir)
+    for src, dst, _ in plan:
+        install_file(src, dst, ssh_dir)
 
     return 0
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    try:
+        status = main()
+    except (OSError, RuntimeError) as error:
+        print(f"error: {error}", file=sys.stderr)
+        status = 1
+    raise SystemExit(status)

@@ -101,6 +101,9 @@ install_binaries() {
             [ -d "$HOME/.fzf/.git" ] || git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
             ~/.fzf/install --all --no-update-rc
         fi
+        if [ -x "$HOME/.fzf/bin/fzf" ]; then
+            ln -sfn "$HOME/.fzf/bin/fzf" "$HOME/.local/bin/fzf"
+        fi
 
         if [ -n "$tree_sitter_url" ] && ! command -v tree-sitter >/dev/null 2>&1; then
             echo "> Installing Tree-sitter from $tree_sitter_url..."
@@ -186,41 +189,26 @@ link_configs() {
 }
 
 install_ssh() {
-    echo "> Installing SSH configuration..."
+    echo "> Installing SSH client configuration..."
     local encrypted_archive="$DOTFILES_DIR/ssh/ssh_archive.tar.gz.gpg"
+    local status=0
+    local temp_ssh_dir
 
     if [ ! -f "$encrypted_archive" ]; then
         echo "  - Error: Encrypted SSH archive not found at $encrypted_archive" >&2
         return 1
     fi
 
-    local temp_ssh_dir
     temp_ssh_dir=$(mktemp -d)
-
     echo " - Decrypting archive..."
     if gpg --decrypt "$encrypted_archive" 2>/dev/null | tar -xz -C "$temp_ssh_dir"; then
-        
-        if [ -d "$HOME/.ssh" ]; then
-            echo " - Backing up existing .ssh to .ssh.bak..."
-            rm -rf "$HOME/.ssh.bak" 
-            mv "$HOME/.ssh" "$HOME/.ssh.bak"
-        fi
-
-        echo " - Installing new keys..."
-        mv "$temp_ssh_dir" "$HOME/.ssh"
-
-        echo "  - Setting secure file permissions..."
-        chmod 700 "$HOME/.ssh"
-        chown -R "$USER:$USER" "$HOME/.ssh"
-        find "$HOME/.ssh" -type f ! -name "*.pub" -exec chmod 600 {} +
-        find "$HOME/.ssh" -type f -name "*.pub" -exec chmod 644 {} +
-        
-        echo " - SSH keys installed successfully."
+        python3 "$DOTFILES_DIR/ssh/extract_ssh_keys.py" --source-dir "$temp_ssh_dir" || status=$?
     else
-        echo " - Error: Decryption failed. No changes were made to existing SSH keys." >&2
-        rm -rf "$temp_ssh_dir"
-        exit 1
+        echo "  - Error: SSH archive decryption failed." >&2
+        status=1
     fi
+    rm -rf "$temp_ssh_dir"
+    return "$status"
 }
 
 main() {
